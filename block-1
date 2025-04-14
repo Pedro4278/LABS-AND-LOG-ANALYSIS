@@ -1,0 +1,36 @@
+
+# 🔍 Log Analysis Report
+
+**Log Source:** [malware-traffic-analysis.net](https://www.malware-traffic-analysis.net)  
+**Log File:** `2022-MTA-workshop-block-1-pcaps.zip`
+
+---
+
+## 📄 Incident Overview
+
+An intensive stream of traffic was detected between an external IP and an internal host:
+
+- **External IP:** `109.206.241.195:5899`
+- **Internal IP:** `10.8.29.101:57129`
+- **Packet Length:** 1206 bytes
+- **Protocol/Port:** Port `5899` is commonly associated with remote control tools such as **VNC** or **Radmin**
+
+⚠️ This behavior suggests a **potential unauthorized remote access attempt**.
+
+---
+
+## 🛡️ Threat Intelligence
+
+A lookup on [VirusTotal](https://www.virustotal.com/) revealed that the external IP address has been **flagged as malicious** by at least two vendors:
+
+- ✅ **AlphaMountain**
+- ✅ **Sophos**
+
+This indicates a known **history of suspicious or malicious behavior**.
+
+---
+
+## ✅ Conclusion
+
+This traffic pattern may represent an attempt to establish remote control using known malicious infrastructure.
+
