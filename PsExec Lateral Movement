@@ -12,7 +12,7 @@ Timestamp: 07:42, 2023
 Anomalous Behavior: SMB commands, PsExec activity
 
 {Screenshot: Wireshark capture showing SMB and PsExec activity}
-{Screenshot: NetworkMiner analysis overview}
+![Image](https://github.com/user-attachments/assets/4c5b181b-d736-4531-ac5c-7bbc6ae28280)
 Timeline of Events
 The sequence of events, derived from packet analysis, is as follows:
 
