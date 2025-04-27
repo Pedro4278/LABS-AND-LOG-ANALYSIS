@@ -11,9 +11,9 @@ This analysis examines network logs revealing a lateral movement technique using
 - **Timestamp**: 07:42, 2023  
 - **Anomalous Behavior**: SMB commands, PsExec activity  
 
-<img src="https://raw.githubusercontent.com/Pedro4278/Log-Analysis/main/wireshark.png" alt="Wireshark" width="400">
+![Wireshark](https://raw.githubusercontent.com/Pedro4278/Log-Analysis/main/wireshark.png)
 
-<img src="https://github.com/Pedro4278/Log-Analysis/blob/688792d836171fb427fc2ebfda421c4e74f10f53/NetworkMiner.png?raw=true" alt="NetworkMiner" width="400">
+![NetworkMiner](https://github.com/Pedro4278/Log-Analysis/blob/688792d836171fb427fc2ebfda421c4e74f10f53/NetworkMiner.png?raw=true)
 
 ### Sequence of Events (Packet Analysis)
 1. **Frames 126–129**: Malicious activity begins with a TCP handshake and SMB negotiation.  
@@ -43,7 +43,7 @@ The following artifacts were extracted using NetworkMiner:
 - **Destination IP**: 10.0.0.131  
 - **Protocol**: SMB2  
 
-<img src="https://github.com/Pedro4278/Log-Analysis/blob/688792d836171fb427fc2ebfda421c4e74f10f53/net1.png?raw=true" alt="NetworkMiner extracted files and metadata" width="400">
+![NetworkMiner extracted files and metadata](https://github.com/Pedro4278/Log-Analysis/blob/688792d836171fb427fc2ebfda421c4e74f10f53/net1.png?raw=true)
 
 ## Analysis
 
