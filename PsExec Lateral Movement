@@ -5,34 +5,28 @@ This analysis examines network logs revealing a lateral movement technique using
 Data Source
 
 Log Type: Network logs
+
 Tools Used: Wireshark, NetworkMiner
+
 Suspect IP: 10.0.0.130
+
 Involved Hosts: MARKETING-PC, SALES-PC, HR-PC, ADMIN$
+
 Timestamp: 07:42, 2023
+
 Anomalous Behavior: SMB commands, PsExec activity
 
-from IPython.display import Image
-Image(url="https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true")
 
-![Wireshark Screenshot](https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true)
 
-<img src="https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true" alt="Wireshark Detail" width="400">
 
-https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png
-
-![Wireshark Image](https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png)
-
-![Descrição da imagem](https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true)
 
 <img src="https://raw.githubusercontent.com/Pedro4278/Log-Analysis/main/wireshark.png" alt="Wireshark" width="400">
 
-![Descrição da imagem Wireshark](https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true)
+<img src="https://github.com/Pedro4278/Log-Analysis/blob/688792d836171fb427fc2ebfda421c4e74f10f53/NetworkMiner.png?raw=true" width="400">
 
-<img src="https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true" alt="Wireshark" width="500">
 
-{Screenshot: Wireshark capture showing SMB and PsExec activity}
 
-![Image](https://github.com/user-attachments/assets/7127c7e5-e4f0-4019-8361-a48e86959f8a)
+
 {NetworkMiner}
 
 The sequence of events, derived from packet analysis, is as follows:
@@ -61,7 +55,7 @@ Source IP: 10.0.0.130
 Destination IP: 10.0.0.131
 Protocol: SMB2
 
-![Image](https://github.com/user-attachments/assets/9f7a0ef9-e678-4f82-a4e5-413bfc2fffd6)
+<img src="https://github.com/Pedro4278/Log-Analysis/blob/688792d836171fb427fc2ebfda421c4e74f10f53/net1.png?raw=true" width="400">
 {Screenshot: NetworkMiner extracted files and metadata}
 
 Analysis
