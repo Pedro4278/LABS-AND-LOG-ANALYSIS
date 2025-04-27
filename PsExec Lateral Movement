@@ -11,9 +11,12 @@ Involved Hosts: MARKETING-PC, SALES-PC, HR-PC, ADMIN$
 Timestamp: 07:42, 2023
 Anomalous Behavior: SMB commands, PsExec activity
 
+<img src="https://raw.githubusercontent.com/Pedro4278/Log-Analysis/main/wireshark.png" alt="Wireshark" width="400">
+
 ![Descrição da imagem Wireshark](https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true)
 
 <img src="https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true" alt="Wireshark" width="500">
+
 {Screenshot: Wireshark capture showing SMB and PsExec activity}
 
 ![Image](https://github.com/user-attachments/assets/7127c7e5-e4f0-4019-8361-a48e86959f8a)
