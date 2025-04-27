@@ -11,9 +11,11 @@ Involved Hosts: MARKETING-PC, SALES-PC, HR-PC, ADMIN$
 Timestamp: 07:42, 2023
 Anomalous Behavior: SMB commands, PsExec activity
 
+![Image](https://github.com/user-attachments/assets/0a8a3d84-9953-4cb0-9682-1d1a513ca836)
 {Screenshot: Wireshark capture showing SMB and PsExec activity}
 
-![Image](https://github.com/user-attachments/assets/37c93d9d-8353-4ad0-8866-52c072396ed5)
+![Image](https://github.com/user-attachments/assets/7127c7e5-e4f0-4019-8361-a48e86959f8a)
+{NetworkMiner}
 
 The sequence of events, derived from packet analysis, is as follows:
 
@@ -41,7 +43,7 @@ Source IP: 10.0.0.130
 Destination IP: 10.0.0.131
 Protocol: SMB2
 
-
+![Image](https://github.com/user-attachments/assets/9f7a0ef9-e678-4f82-a4e5-413bfc2fffd6)
 {Screenshot: NetworkMiner extracted files and metadata}
 
 Analysis
