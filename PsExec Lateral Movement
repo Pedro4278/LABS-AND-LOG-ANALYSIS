@@ -13,7 +13,7 @@ Anomalous Behavior: SMB commands, PsExec activity
 
 {Screenshot: Wireshark capture showing SMB and PsExec activity}
 
-https://github.com/user-attachments/assets/176fa11d-8838-4bc6-9f7f-b8cbdc41d9a8
+https://github.com/user-attachments/assets/7d9b1690-4b4b-49f4-9303-ecd81392deee
 
 The sequence of events, derived from packet analysis, is as follows:
 
