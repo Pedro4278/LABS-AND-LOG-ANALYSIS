@@ -12,8 +12,9 @@ Timestamp: 07:42, 2023
 Anomalous Behavior: SMB commands, PsExec activity
 
 {Screenshot: Wireshark capture showing SMB and PsExec activity}
-https://private-user-images.githubusercontent.com/130411439/437980639-0739b690-7ba0-436f-82d4-3fd518ec2181.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDU3NzgzNTUsIm5iZiI6MTc0NTc3ODA1NSwicGF0aCI6Ii8xMzA0MTE0MzkvNDM3OTgwNjM5LTA3MzliNjkwLTdiYTAtNDM2Zi04MmQ0LTNmZDUxOGVjMjE4MS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwNDI3JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDQyN1QxODIwNTVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT02NDk4YjU5MDBhZjc5YzlmMzZiOTA4NWYyOTdmOWNjZGQwYzg1NjdhZGQ2ZjA2MWZhMDc0Njc4ZDUzMzQxNDNlJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.Di2QXFjXqaFCLXXpJv-QtlC3cL50DDt1tvAOQcQeOhs
-Timeline of Events
+
+![Image](https://github.com/user-attachments/assets/176fa11d-8838-4bc6-9f7f-b8cbdc41d9a8)
+
 The sequence of events, derived from packet analysis, is as follows:
 
 Frames 126–129: Malicious activity begins with a TCP handshake and SMB negotiation.
