@@ -11,6 +11,9 @@ Involved Hosts: MARKETING-PC, SALES-PC, HR-PC, ADMIN$
 Timestamp: 07:42, 2023
 Anomalous Behavior: SMB commands, PsExec activity
 
+from IPython.display import Image
+Image(url="https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true")
+
 ![Wireshark Screenshot](https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true)
 
 <img src="https://github.com/Pedro4278/Log-Analysis/blob/main/wireshark.png?raw=true" alt="Wireshark Detail" width="400">
