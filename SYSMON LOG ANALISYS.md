@@ -188,6 +188,6 @@ DestinationPort: 4444
 
 ## Conclusion
 
-This lab demonstrates that even basic malware leaves detectable traces in Sysmon logs.  
-Events such as process creation, registry modification, and network activity are powerful indicators for defenders.  
-Despite some execution challenges, the experiment shows the effectiveness of endpoint monitoring and highlights the importance of log analysis for incident detection.
+This lab was extremely valuable for deepening my understanding of Sysmon logging and key Windows processes such as `svchost.exe`, `explorer.exe`, and `rundll32.exe`.  
+Although I was not able to successfully execute the first malware sample, the process of creating and troubleshooting it gave me significant hands-on experience.  
+I plan to conduct a follow-up lab to further explore DLL injection techniques and Windows process behavior in greater detail.
