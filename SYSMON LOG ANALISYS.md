@@ -115,7 +115,7 @@ python3 -m http.server 8000
 
 ON THE TARGET MACHINE:
 
-![Image](https://github.com/user-attachments/assets/b5750b38-2ac5-400a-9140-10c168948a44)
+![Image](https://github.com/user-attachments/assets/8a158433-7f37-4a79-909c-2df56d66ccc2)
 ---
 
 ## Execution on the Target Machine and Sysmon Log Analysis
