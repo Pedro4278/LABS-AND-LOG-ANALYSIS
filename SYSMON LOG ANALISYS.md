@@ -2,8 +2,8 @@
 
 ## Introduction
 
-In this lab, I infected a virtual Windows machine with an executable containing a simple payload. 
-The executable was written in Python and its objective was to inject a DLL into a running Windows service (Notepad). 
+In this lab, I infected a virtual Windows machine with an executable containing a simple payload.  
+The executable was written in Python and its objective was to inject a DLL into a running Windows service (Notepad).  
 The primary goal was to detect signs of this malicious behavior through Sysmon logs and evaluate how native Windows defenses respond.
 
 **Tools Used**: Sysmon, Metasploit, Wine, Kali Linux, Event Viewer, Python, PyInstaller, Oracle VirtualBox
@@ -16,8 +16,7 @@ The primary goal was to detect signs of this malicious behavior through Sysmon l
 
 To perform DLL injection, I used a simple Python script found online.
 
-INJECTION CODE[
-
+```python
 import ctypes
 import ctypes.wintypes as wintypes
 import psutil
@@ -61,7 +60,7 @@ h_kernel32 = kernel32.GetModuleHandleA(b'kernel32.dll')
 load_library = kernel32.GetProcAddress(h_kernel32, b'LoadLibraryA')
 
 # Create remote thread in target process
-kernel32.CreateRemoteThread(h_process, None, 0, load_library, arg_address, 0, None)]
+kernel32.CreateRemoteThread(h_process, None, 0, load_library, arg_address, 0, None)
 
 
 The PID of the process changes everytime that a new process is run so was necessary we insert this 
