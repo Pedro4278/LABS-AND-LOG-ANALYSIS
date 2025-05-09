@@ -108,6 +108,8 @@ python3 -m http.server 8000
 
 Despite disabling basic Windows Defender features, getting a stable reverse connection was challenging. Still, Sysmon successfully logged multiple indicators of compromise.
 
+[PICTURE EVENT VIEWER]
+
 ---
 
 ## Log Analysis
@@ -174,6 +176,8 @@ It's a passive but strong indicator that the file was executed.
 
 **Explanation**: The process was terminated shortly after execution, potentially due to Windows defenses or a code error. 
 Troubleshooting this issue was beyond the scope of this article, so a simpler payload was created to continue the lab.
+
+[PICTURE OF NEW PAYLOAD]
 
 ### Event ID 3: Network Connection
 
