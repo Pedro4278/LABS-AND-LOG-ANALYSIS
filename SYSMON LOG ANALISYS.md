@@ -60,7 +60,7 @@ h_kernel32 = kernel32.GetModuleHandleA(b'kernel32.dll')
 load_library = kernel32.GetProcAddress(h_kernel32, b'LoadLibraryA')
 
 # Create remote thread in target process
-kernel32.CreateRemoteThread(h_process, None, 0, load_library, arg_address, 0, None)
+kernel32.CreateRemoteThread(h_process, None, 0, load_library, arg_address, 0, None)```
 ---
 
 
