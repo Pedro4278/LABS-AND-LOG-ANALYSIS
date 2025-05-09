@@ -109,6 +109,7 @@ python3 -m http.server 8000
 ```
 ![Image](https://github.com/user-attachments/assets/8654a2ea-66e0-465f-bfb9-918f40ed46b8)
 
+ON THE TARGET MACHINE:
 
 ![Image](https://github.com/user-attachments/assets/b5750b38-2ac5-400a-9140-10c168948a44)
 ---
