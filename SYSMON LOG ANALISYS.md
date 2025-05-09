@@ -107,9 +107,10 @@ To deliver the payload, I used a simple Python HTTP server on the attacker machi
 ```bash
 python3 -m http.server 8000
 ```
+![Image](https://github.com/user-attachments/assets/8654a2ea-66e0-465f-bfb9-918f40ed46b8)
 
-![Image](https://github.com/user-attachments/assets/f0aec13c-2cd1-43fc-a262-b08449a5e8a7)
 
+![Image](https://github.com/user-attachments/assets/b5750b38-2ac5-400a-9140-10c168948a44)
 ---
 
 ## Execution on the Target Machine and Sysmon Log Analysis
@@ -156,7 +157,7 @@ Image: C:\Users\home\Downloads\injection.exe
 
 **Explanation**: The process was terminated shortly after execution, possibly due to Windows defenses or a code error.
 
-![Image](https://github.com/user-attachments/assets/fdcbacff-886d-4848-aa5e-cea5c3c700f4)
+![Image](https://github.com/user-attachments/assets/654d581d-448b-41fd-9989-a6007542fccf)
 
 ### Event ID 3: Network Connection
 
