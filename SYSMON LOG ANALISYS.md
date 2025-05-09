@@ -8,6 +8,10 @@ The primary goal was to detect signs of this malicious behavior through Sysmon l
 
 **Tools Used**: Sysmon, Metasploit, Wine, Kali Linux, Event Viewer, Python, PyInstaller, Oracle VirtualBox
 
+### Sysmon Configuration
+
+![Image](https://github.com/user-attachments/assets/9622ffff-10ed-45c0-9805-0e5931343393)
+
 ---
 
 ## Malware Creation and Delivery
@@ -124,7 +128,7 @@ Despite disabling basic Windows Defender features, getting a stable reverse conn
 
 ## Log Analysis
 
-### Event ID 1: Process Creation
+### Event ID 1: Process Create
 
 ```
 UtcTime: 2025-05-08 13:21:20.798
@@ -137,7 +141,7 @@ Hashes: MD5=..., SHA256=...
 **Explanation**: Event ID 1 logs every process creation. Although not inherently malicious, indicators like missing file metadata and hash verification help identify suspicious files.  
 The parent process being `explorer.exe` suggests user interaction (manual execution).
 
-### Event ID 13: Registry Modification
+### Event ID 13: Registry Event
 
 ```
 UtcTime: 2025-05-08 13:21:22.977
