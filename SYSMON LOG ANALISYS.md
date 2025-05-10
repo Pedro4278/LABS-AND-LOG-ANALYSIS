@@ -141,6 +141,17 @@ Hashes: MD5=..., SHA256=...
 **Explanation**: Event ID 1 logs every process creation. Although not inherently malicious, indicators like missing file metadata and hash verification help identify suspicious files.  
 The parent process being `explorer.exe` suggests user interaction (manual execution).
 
+  
+  ### Event ID 12: Registry Object Added or Deleted
+  ```
+  RuleName InvDB 
+  EventType DeleteValue 
+  UtcTime 2025-05-09 23:38:12.943    
+  Image C:\Windows\system32\svchost.exe 
+  TargetObject HKU\S-1-5-21-1708299313-952822903-2634392219-1001\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store\C:\Users\home\Downloads\injection.exe 
+  ```
+**Explanation**:The process `svchost.exe`, running as `NT AUTHORITY\SYSTEM`, deleted a registry entry related to the executable `injection.exe`. This behavior may indicate an attempt to hide execution traces, which is common in evasion or anti-forensic techniques following DLL injection.
+
 ### Event ID 13: Registry Event
 
 ```
