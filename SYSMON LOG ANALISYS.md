@@ -155,13 +155,19 @@ The parent process being `explorer.exe` suggests user interaction (manual execut
 ### Event ID 13: Registry Event
 
 ```
+RuleName InvDB 
 UtcTime: 2025-05-08 13:21:22.977
 Image: C:\Windows\system32\svchost.exe
 TargetObject: HKU\...\AppCompatFlags\Compatibility Assistant\Store\...injection.exe
+
+```
+**Rule from the Sysmon configuration file:**
+```
+<TargetObject name="InvDB" condition="contains">Compatibility Assistant\Store\</TargetObject> <!-- Inventory -->
 ```
 
 **Explanation**: This shows `svchost.exe` modifying the registry to store information about the executed file.  
-Windows uses this Compatibility Assistant key when unusual behavior is detected.
+Windows uses this Compatibility Assistant key when unusual behavior is detected.The log shows a rule named **InvDB**. After searching Sysmon's configuration file, I found the rule that records this behavior. I believe it was triggered because the executable interacted with the Compatibility Assistant.
 
 ### Event ID 5: Process Terminated
 
