@@ -162,7 +162,8 @@ TargetObject: HKU\...\AppCompatFlags\Compatibility Assistant\Store\...injection.
 
 ```
 **Rule from the Sysmon configuration file:**
-```
+
+```xml
 <TargetObject name="InvDB" condition="contains">Compatibility Assistant\Store\</TargetObject> <!-- Inventory -->
 ```
 
