@@ -119,8 +119,17 @@ ht = ctypes.windll.kernel32.CreateThread(
 ctypes.windll.kernel32.WaitForSingleObject(ht, -1)
  ```
     
+## 🧪 GERANDO UM EXCUTAVEL
+
+Apos ter configurado o codigo foi usado este comando para gerar o executavel 
+
+```pyinstaller --noconfirm --onefile malwareobfuscated.py```
+
+Entretando nos adicionamos mais um degrau de obfuscacao editando o arquivo .spec, o objetivo e parecer ao maximo um programa normal
+do windows. 
 
 
+[.SPEC PRINT]
 
 
 
