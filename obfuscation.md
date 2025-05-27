@@ -52,11 +52,11 @@ shellcode nos usamos este comando para converter o resultado em codigo hexadecim
 
 ```xml  xxd -p result3.raw | tr -d '\n' | sed 's/\(..\)/\\x\1/g' > result03.txt ```
 
-   (PRINT DA ENCRIPTACAO HEXADECIMAL)
+  Resultado do comando anterior:
    ![Image](https://github.com/user-attachments/assets/4263f989-ef76-4d00-936e-32da016fc588)
 
   Logo apos eu usei este codigo python para converter a saida do comando anterior em uma versao encryptada usando uma chave AES de 16 bytes (128 bits),
-  isso vai ajudar bypass o sistema de defesa do windows tornando mais dificil para o antivirus indentificar o codigo malicioso dentro do executavel 
+  isso vai ajudar bypass o sistema de defesa do windows tornando mais dificil para o antivirus indentificar o codigo malicioso dentro do executavel:
 
 [PRINT DO VS CODE ENCRYPTACAO]
 ![Image](https://github.com/user-attachments/assets/e32f7c99-fe4f-4b0e-ae34-aabd9e52e414)
@@ -258,12 +258,8 @@ de login via ssh em um curto espaco de tempo caraterizando um brute force attack
 *LOGS EM SPLUNK*
 
 ![Image](https://github.com/user-attachments/assets/f7f7b16d-4762-4bfe-aec9-bd20f96bf1fd)
-
-
-
-Como o malware foi bloquado antes de ser executado no foram gerados muitos logs em sysmon 
-porem dois logs me chamaram a atencao. 
-
+Essa quantidade tentativa de login em tao pouco tempo capturadas pelo splunk acende uma red flag analisando mais 
+a fundo nos logs em sysmon encontamos mais uma eveidencia de atividade maliciosa
 Durante a execução do payload ofuscado, mesmo antes de um shell ser estabelecido, o Sysmon registrou o seguinte comportamento:
 
 1. [Creation of Remote Treat]
@@ -273,9 +269,6 @@ Esse tipo de evento é típico de malwares que tentam executar código em outro 
 3. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
 ![Image](https://github.com/user-attachments/assets/ea9fae2a-8fe5-4ef5-aea2-cf221346e740)
 Pouco após a tentativa de injeção de thread remota registrada pelo Sysmon (Event ID 8), o processo SecurityHealthHost.exe, parte do Windows Defender, foi invocado. Isso sugere que a carga maliciosa foi identificada e bloqueada pela solução nativa do sistema, interrompendo a execução completa do ataque.
-
-
-
 
 
 ##CONCLUSAO 
