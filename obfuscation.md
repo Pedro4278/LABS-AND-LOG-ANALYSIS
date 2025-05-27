@@ -212,34 +212,46 @@ para realizar a requisicao vamos testar alguns executaveis nativos do windowns p
 
 [PRINT CERTUTIL COMMAND]
 
+Certutil.exe é uma Living-off-the-Land Binary (LOLBAS) usada por atacantes para baixar cargas maliciosas via HTTP, 
+mas também, como podemos ver pelo output muito monitorada por antivirus modernos. Infelizmente eu nao consegui ofuscar o antivirus p suficiente deste vez 
+porem ainda podemos analisar os logs gerados durante a acao.
+
 [PRINT ANTIVIRUS]
 
-Certutil.exe é uma Living-off-the-Land Binary (LOLBAS) usada por atacantes para baixar cargas maliciosas via HTTP, 
-mas também, como podemos ver pelo output muito monitorada por antivirus modernos. 
 
 
-1. **Objetivo da simulação**
-2. **Comando executado pelo atacante**
-3. **Expectativa (o que deve ser gerado no log)**
 
 ---
 
 ## 🔍 Coleta e Análise dos Logs
 
-### 📁 Sysmon - Configuração
+### 📁 Splunk - Configuração
 Trecho da config usada (ou link para ela).
 
 
+*TENTATIVAS DE LOGIN*
+A principio o que mais acenederia um alerta analisando os logs em splunk seria a quantidade de tentantivas 
+de login via ssh em um curto espaco de tempo caraterizando um brute force attack 
+
+[PRINT SPLUNK DAS TENTATIVAS DE LOGING]
+
+*LOGS EM SPLUNK*
+
+Como o malware foi bloquado antes de ser executado no foram gerados muitos logs em sysmon 
+porem dois logs me chamaram a atencao: 
+
+1. [Creation of Remote Treat]
+
+2. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
 
 
 
 
-```xml
-<!-- Exemplo -->
-<EventFiltering>
-  <ProcessCreate onmatch="include">
-    <Image condition="contains">rundll32.exe</Image>
-  </ProcessCreate>
-</EventFiltering>
-```
+
+
+##CONCLUSAO 
+
+
+
+
 
