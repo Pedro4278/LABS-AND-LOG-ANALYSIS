@@ -25,10 +25,13 @@ assim que foi baixado, entretanto todo o processo de criacao e execucao geraram 
  era um problema de permissoes do windows 
 
  (PRINT DO PROGRAMA SERVICES/SPLUNK)
+ ![Image](https://github.com/user-attachments/assets/6e6b6d0f-1e6f-417a-a815-d30c4effb318)
 
  E necessario que se insira este comando no arquivo input do splunk para receber os logs 
+  
+  (PRINT DO ARQUIVO DE CONFIGURACAO SPLUNK)
+![Image](https://github.com/user-attachments/assets/1c1531f3-a47a-4fe6-825c-bb597b36d014)
 
- (PRINT DO ARQUIVO DE CONFIGURACAO SPLUNK)
 
 
 
@@ -201,7 +204,7 @@ pyinstaller malwareobfuscated.spec
 
 
 
-##DELIVERING THE PAYLOAD 
+## DELIVERING THE PAYLOAD 
 
 Para entregarmos o payload vamos realizar um brute force attack em uma porta ssh que eu deixei aberta na VM e logo apos vamos fazer uma requisicao para o python server e baixar o payload
 para realizar a requisicao vamos testar alguns executaveis nativos do windowns para aumentar o nivel de ofucacao
@@ -216,7 +219,7 @@ Certutil.exe é uma Living-off-the-Land Binary (LOLBAS) usada por atacantes para
 mas também, como podemos ver pelo output muito monitorada por antivirus modernos. Infelizmente eu nao consegui ofuscar o antivirus p suficiente deste vez 
 porem ainda podemos analisar os logs gerados durante a acao.
 
-[PRINT ANTIVIRUS]
+![Image](https://github.com/user-attachments/assets/7647fae1-edd7-4f82-82a3-9d75d20fb688)
 
 
 
@@ -233,16 +236,19 @@ Trecho da config usada (ou link para ela).
 A principio o que mais acenederia um alerta analisando os logs em splunk seria a quantidade de tentantivas 
 de login via ssh em um curto espaco de tempo caraterizando um brute force attack 
 
-[PRINT SPLUNK DAS TENTATIVAS DE LOGING]
-
 *LOGS EM SPLUNK*
+
+![Image](https://github.com/user-attachments/assets/f7f7b16d-4762-4bfe-aec9-bd20f96bf1fd)
+
+
 
 Como o malware foi bloquado antes de ser executado no foram gerados muitos logs em sysmon 
 porem dois logs me chamaram a atencao: 
 
 1. [Creation of Remote Treat]
+ ![Image](https://github.com/user-attachments/assets/405cbb63-bf4f-40df-a30c-8129ed814e56)
 
-2. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
+3. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
 
 
 
