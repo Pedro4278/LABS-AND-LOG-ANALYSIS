@@ -303,14 +303,17 @@ Durante a execução do payload ofuscado, mesmo antes de um shell ser estabeleci
 
 1. [Creation of Remote Treat]
  ![Image](https://github.com/user-attachments/assets/405cbb63-bf4f-40df-a30c-8129ed814e56)
-Esse tipo de evento é típico de malwares que tentam executar código em outro processo para evitar detecção (como DLL injection). Apesar do Defender ou outro mecanismo ter bloqueado a carga útil antes da execução total, o evento mostra que o payload chegou a tentar a injeção de código na memória de outro processo. Isso por si só é uma IOC (Indicator of Compromise) que foi provavelmente o que acionou o segundo log
+Esse tipo de evento é típico de malwares que tentam executar código em outro processo para evitar detecção (como DLL injection). Entretanto nos ja sabemos que o malware nao foi nem se quer baixado
+entao eu acredito que este log foi acionado quando eu solicitei um cmd.exe via ssh, mesmo que nao esteja diretamente relacionado com o malware ainda sim e um artefato importante.
 
-2. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
+3. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
 ![Image](https://github.com/user-attachments/assets/ea9fae2a-8fe5-4ef5-aea2-cf221346e740)
-Pouco após a tentativa de injeção de thread remota registrada pelo Sysmon (Event ID 8), o processo SecurityHealthHost.exe, parte do Windows Defender, foi invocado. Isso sugere que a carga maliciosa foi identificada e bloqueada pela solução nativa do sistema, interrompendo a execução completa do ataque.
+Pouco após a tentativa download via cetutil.exe, o processo SecurityHealthHost.exe, parte do Windows Defender, foi invocado. Isso sugere que a carga/acao maliciosa foi identificada e bloqueada pela solução nativa do sistema, interrompendo a execução completa do ataque.
 
-3. [IDENTIFICACAO PELO SISTEMA DE DEFESA]
+4. [IDENTIFICACAO PELO SISTEMA DE DEFESA]
 ![Image](https://github.com/user-attachments/assets/e1290956-49f1-473f-90bc-caf32dd7de12)
+
+Neste log vemos a identificao pelo Windows Defender da tentativa de LOLbin separei os detalhes mais importantes no prompt abaixo. 
 
 ```
 Threat Name:      Trojan:Win32/Ceprolad.A  
@@ -323,10 +326,12 @@ Path:             C:\Windows\System32\certutil.exe
 Action Taken:     Not Applicable 
 ```
 
+
+
 3.[CCONFIRMACAO DO BLOQUEIO PELO SISTEMA DE DEFESA]
 ![Image](https://github.com/user-attachments/assets/c427e929-77b8-4468-bb63-cbeb4c7bad3f)
 
-
+Neste ultimo log nos temos a confirmacao de que a ameca foi removida com sucesso pelo windows defender ```Action Name: Remove```, ``` The operation completed successfully.```
 
 ##CONCLUSAO 
 
