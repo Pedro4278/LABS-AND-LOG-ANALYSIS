@@ -321,6 +321,7 @@ Path:             C:\Windows\System32\certutil.exe
 Action Taken:     Not Applicable 
 ```
 
+Como podemos ver o Windows Defender bloqueou a requisicao antes que houve a conexao por isso nao foi identificado o IP.
 
 
 3.[CCONFIRMACAO DO BLOQUEIO PELO SISTEMA DE DEFESA]
