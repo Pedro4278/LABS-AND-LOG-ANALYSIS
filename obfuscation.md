@@ -1,10 +1,15 @@
-# 🛡️ [TÍTULO DO ARTIGO AQUI]
-> *Exemplo: Detectando Injeção de DLL com Sysmon e Splunk*
+# 🛡️ Evasão e Execução: Criando, Ofuscando e Entregando Shellcode com AES e PyInstaller
 
-## 📌 Resumo
-Neste eu criei um shellcode usando metasploit e apliquei algumas tecnicas de obfuscacao e encryptacao com o objetivo de passar pela seguranca de uma 
-virtual machine e observar a reacao do sistema de defesa e os logs gerados por splunk e sysmon infelizmente (ou felizmente) o malware foi detectado pelo sistema windows 
-assim que foi baixado, entretanto todo o processo de criacao e execucao geraram muito conhecimento pratico que eu vou registrar aqui.  
+
+## 
+
+Neste artigo técnico, realizamos um experimento prático que simula um ataque com foco em evasão de defesas no Windows. Criamos um payload utilizando o *Metasploit*, realizamos a ofuscação com criptografia AES em Python, e empacotamos o malware com PyInstaller. 
+
+Para entrega, exploramos um cenário realista: um ataque de força bruta via SSH, seguido do uso de `certutil.exe` para baixar o executável — técnica comumente classificada como *Living Off the Land Binary (LOLBin)*.
+
+Ao longo do processo, também analisamos os artefatos gerados com Sysmon e Splunk, documentando indicadores e comportamentos úteis para analistas SOC e blue teamers em geral.
+
+
 
 ---
 
