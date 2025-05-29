@@ -32,21 +32,23 @@ Nunca execute essas técnicas em sistemas que você não possui ou não tem auto
 
 
 ## 🧪 DETALHES TECNICOS 
+ 
  Durante a instalacao do Splunk eu tive alguns problemas para recebecer os logs sysmon no splunk GUI depois de muito procurar eu descobri que 
  era um problema de permissoes do windows, em services na aba log on e necessario que a opcao 'local system account' esteja selecionada, assim como na imagem 
 
- (PRINT DO PROGRAMA SERVICES/SPLUNK)
+ [DANDO PERMISSOES PARA O SPLUNK NA MAQUINA ALVO]
  ![Image](https://github.com/user-attachments/assets/6e6b6d0f-1e6f-417a-a815-d30c4effb318)
 
  Para receber os logs em splunk voce deve colocar este codigo no arquvivo output.conf do splunk caso ainda nao tenha sido configurado
   
-  (PRINT DO ARQUIVO DE CONFIGURACAO SPLUNK)
+  [ARQUIVO INPUT.CONF]
 ![Image](https://github.com/user-attachments/assets/1c1531f3-a47a-4fe6-825c-bb597b36d014)
 
 
 
 
 ## 🧪 SOBRE O MALWARE E OFUSCACAO 
+
  Para este artigo eu escolhi usar um shellcode metasploist e obfusca-lo com codigo python para este proposito foi escolhido esta opcao 
  
 
@@ -57,7 +59,7 @@ shellcode nos usamos este comando para converter o resultado em codigo hexadecim
 
 ```xml  xxd -p result3.raw | tr -d '\n' | sed 's/\(..\)/\\x\1/g' > result03.txt ```
 
-  Resultado do comando anterior:
+  [SHELLCODE EM CONDIGO HEXADECIMAL]
    ![Image](https://github.com/user-attachments/assets/4263f989-ef76-4d00-936e-32da016fc588)
 
   Logo apos eu usei este codigo python para converter a saida do comando anterior em uma versao encryptada usando uma chave AES de 16 bytes (128 bits),
@@ -68,21 +70,22 @@ shellcode nos usamos este comando para converter o resultado em codigo hexadecim
 
 Agora nos temos um shellcode pronto para ser inserido no codigo.
 
-# Sobre *VirtualAlloc e HeapAlloc*     
+### Sobre *VirtualAlloc e HeapAlloc*     
 
    Enquanto estudava para montar este malware me deparei com duas opcoes sobre como o malware iria alocar memoria no sistema alvo 
- pelo o que eu entendi ```xml VitualAlloc``` aloca grandes blocos de memoria deixando tudo pronto para que o codigo ja seja executado,
- e muito usado por sistemas complexos entretanto deixa muito rastros no sistema (```xml xmlVirtualAlloc + WriteProcessMemory + CreateRemoteThread```)
+ pelo o que eu entendi ```VitualAlloc``` aloca grandes blocos de memoria deixando tudo pronto para que o codigo ja seja executado,
+ e muito usado por sistemas complexos entretanto deixa muito rastros no sistema (```VirtualAlloc + WriteProcessMemory + CreateRemoteThread```)
  e por ja ter sido muito usada ja e conhecida por antivirus.
  
- s2  ```xml HeapAlloc``` por outro lado usa um pedaco pequeno da memoria disponivel e e metodo muito usado pela maioria dos programas isso torna essa opcao 
- muito menos suspeita o ponto negativo e que o pedaco de memoria alocado inicialmente nao pode executar o codigo entao e necessario a execucao de outro comando depois ```xml HEAP_CREATE_ENABLE_EXECUTE```
+  ```HeapAlloc``` por outro lado usa um pedaco pequeno da memoria disponivel e e metodo muito usado pela maioria dos programas isso torna essa opcao 
+ muito menos suspeita o ponto negativo e que o pedaco de memoria alocado inicialmente nao pode executar o codigo entao e necessario a execucao de outro comando depois ```HEAP_CREATE_ENABLE_EXECUTE```
  para liberar a execucao. Como o objetivo e bypass as defesas do windows eu escolhi a segunda opcao.
 
  **NOTE:** Enquanto escrevia este artigo descobri que a opcao  ```VirtualAlloc + VirtualProtect``` pode ser mais eficiente em bypass o sistema de defesa, vou testar isso em artigos futuros 
 
- Esse foi o codigo adquirido na internet para descriptografar um shellcode usando AES-CBC, 
- alocar memória executável em uma heap privada no processo atual e executar o shellcode via CreateThread o shellcode encryptografado esta na variavel encrypted_b64:
+### Sobre o codigo
+
+ Este codigo em Python que descriptografa o shellcode AES-CBC (armazenado em Base64), remove o padding PKCS7 (Adiciona bytes ao para garantir que ele tenha o tamanho exato de um multiplo de 16 bytes como e necessario em AES), aloca memória executável em uma heap privada do processo e executa o shellcode usando CreateThread. A chave e o IV devem ser os mesmos usados na criptografia.
 
  ```Python
 import base64
@@ -145,9 +148,9 @@ pyinstaller --noconfirm --onefile malwareobfuscated.py
 ```
 ![Image](https://github.com/user-attachments/assets/beb0f0eb-2ece-4e54-8f8e-7e046adbf5b3)
 
-Este comando retornou um executavel pronto mas tambem um arquivo .spec que podemos usar para alterar algumas caracteristicas do malware para torna-lo mais dificil de ser detectado
+Este comando retornou um executavel pronto mas tambem um arquivo .spec que vamos usar para alterar algumas caracteristicas do malware para torna-lo mais dificil de ser detectado
 
-**.SPEC FILE** 
+### .SPEC FILE 
 
 ```bash
 # -*- mode: python ; coding: utf-8 -*-
