@@ -62,7 +62,7 @@ This outputs a .raw shellcode, which we then convert to a hexadecimal string:
 
 Next, I encrypted the shellcode using a 16-byte (128-bit) AES key to bypass Windows defenses. Below is the Python script for encryption:
 
-[PRINT DO VS CODE ENCRYPTACAO]
+[VS CODE: ENCRYPTION]
 ![Image](https://github.com/user-attachments/assets/e32f7c99-fe4f-4b0e-ae34-aabd9e52e414)
 
 The shellcode is now ready for embedding.
