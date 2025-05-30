@@ -1,4 +1,4 @@
-# 🛡️ Evasão e Execução: Criando, Ofuscando e Entregando Shellcode com AES e PyInstaller
+# 🛡️ Obfuscating Malware with Encryption: A Sysmon Log Analysis
 
 
 ## OVERVIEW
