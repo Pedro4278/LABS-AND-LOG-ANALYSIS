@@ -371,7 +371,7 @@ Here we have confirmation that the threat was successfully removed by Windows De
 Last but not least, we have confirmation that Windows Defender detected the malicious execution of
 ```certutil.exe``` even when it was copied to another directory and renamed.
 
-##THOUGHTS
+## THOUGHTS
 
 Although my current focus is on defensive security, this lab ended up exploring offensive techniques more deeply than I expected. The creation and obfuscation of the shellcode gave me a practical insight into how malicious payloads can be built and executed discreetly on Windows.
 Although the code can still be improved with more advanced evasion techniques, this experience provided me with a more concrete understanding of how Windows Defender and other security solutions operate.
